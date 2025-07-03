@@ -23,7 +23,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [x] Map loader.
 - [ ] Session state.
 - [ ] Layers.
-- [ ] Sprites.
+- [x] Sprites.
 - [ ] Toll doors.
 - [ ] Trigger encounters.
 

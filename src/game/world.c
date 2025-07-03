@@ -4,13 +4,51 @@
 
 #include "game.h"
 
+/* Load map etc etc.
+ * Don't do this during a sprite update.
+ */
+ 
+static int enter_map(int rid) {
+  struct map *map=mapv_get(rid);
+  if (!map) {
+    fprintf(stderr,"map:%d not found\n",rid);
+    return -1;
+  }
+  
+  while (g.spritec>0) {
+    g.spritec--;
+    sprite_del(g.spritev[g.spritec]);
+  }
+  
+  g.map=map;
+  
+  struct rom_command_reader reader={.v=map->cmdv,.c=map->cmdc};
+  struct rom_command cmd;
+  while (rom_command_reader_next(&cmd,&reader)>0) {
+    switch (cmd.opcode) {
+      case CMD_map_sprite: {
+          double x=cmd.argv[0]+0.5;
+          double y=cmd.argv[1]+0.5;
+          int rid=(cmd.argv[2]<<8)|cmd.argv[3];
+          uint32_t arg=(cmd.argv[4]<<24)|(cmd.argv[5]<<16)|(cmd.argv[6]<<8)|cmd.argv[7];
+          struct sprite *sprite=sprite_spawn(rid,0,x,y,arg);
+        } break;
+      case CMD_map_door: {
+          //TODO door
+        } break;
+    }
+  }
+  
+  return 0;
+}
+
 /* Reset.
  */
  
 int world_reset() {
-  if (!(g.map=mapv_get(RID_map_start))) return -1;
   g.hp=4;
   g.maxhp=8;
+  if (enter_map(RID_map_start)<0) return -1;
   return 0;
 }
 
@@ -29,7 +67,18 @@ void world_render() {
   dsty-=NS_sys_tilesize>>1;
   
   // Sprites.
-  graf_draw_tile(&g.graf,g.texid_sprites,dstx+NS_sys_tilesize*10+(NS_sys_tilesize>>1),dsty+NS_sys_tilesize*2+(NS_sys_tilesize>>1),0x00,0);
+  struct sprite **p=g.spritev;
+  for (i=g.spritec;i-->0;p++) {
+    struct sprite *sprite=*p;
+    if (sprite->defunct) continue;
+    int sx=dstx+(int)(sprite->x*NS_sys_tilesize);
+    int sy=dsty+(int)(sprite->y*NS_sys_tilesize);
+    if (sprite->type->render) {
+      sprite->type->render(sprite,sx,sy);
+    } else {
+      graf_draw_tile(&g.graf,g.texid_sprites,sx,sy,sprite->tileid,sprite->xform);
+    }
+  }
 
   // Blackout header zone, draw HP and gold at the left side.
   graf_draw_rect(&g.graf,0,0,FBW,HEADERH,0x000000ff);

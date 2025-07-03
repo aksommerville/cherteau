@@ -5,6 +5,21 @@ struct g g={0};
 /* Resource store.
  *********************************************************************************/
  
+int res_get(void *dstpp,int tid,int rid) {
+  struct rom_reader reader={0};
+  rom_reader_init(&reader,g.rom,g.romc);
+  struct rom_res *res;
+  while (res=rom_reader_next(&reader)) {
+    if (res->tid>tid) return 0;
+    if (res->tid<tid) continue;
+    if (res->rid>rid) return 0;
+    if (res->rid<rid) continue;
+    *(const void**)dstpp=res->v;
+    return res->c;
+  }
+  return 0;
+}
+ 
 static int mapv_search(int rid) {
   int lo=0,hi=g.mapc;
   while (lo<hi) {

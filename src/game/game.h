@@ -8,6 +8,7 @@
 #include "opt/rom/rom.h"
 #include "egg_rom_toc.h"
 #include "shared_symbols.h"
+#include "sprite.h"
 
 #define FBW 320
 #define FBH 180
@@ -37,9 +38,12 @@ extern struct g {
   
   struct map *map; // WEAK, present during play.
   int hp,maxhp;
+  struct sprite **spritev;
+  int spritec,spritea;
 } g;
 
 struct map *mapv_get(int rid);
+int res_get(void *dstpp,int tid,int rid);
 
 int world_reset();
 void world_render();
