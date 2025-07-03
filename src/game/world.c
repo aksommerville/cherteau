@@ -48,6 +48,9 @@ static int enter_map(int rid) {
 int world_reset() {
   g.hp=4;
   g.maxhp=8;
+  g.gold=40;
+  memset(g.tollv,10,TOLL_LIMIT);
+  g.tollc=TOLL_LIMIT;
   if (enter_map(RID_map_start)<0) return -1;
   return 0;
 }
@@ -86,9 +89,9 @@ void world_render() {
   dsty=5;
   for (i=0;i<g.maxhp;i++,dstx+=8) graf_draw_tile(&g.graf,g.texid_sprites,dstx,dsty,(i<g.hp)?0x3b:0x3a,0);
   graf_draw_tile(&g.graf,g.texid_sprites,5,15,0x3c,0);
-  graf_draw_tile(&g.graf,g.texid_sprites,16,15,0x31,0);
-  graf_draw_tile(&g.graf,g.texid_sprites,23,15,0x32,0);
-  graf_draw_tile(&g.graf,g.texid_sprites,30,15,0x33,0);
+  graf_draw_tile(&g.graf,g.texid_sprites,16,15,0x30+g.gold/100,0);
+  graf_draw_tile(&g.graf,g.texid_sprites,23,15,0x30+(g.gold/10)%10,0);
+  graf_draw_tile(&g.graf,g.texid_sprites,30,15,0x30+g.gold%10,0);
   
   // Minimap on the right side of the header.
   dstx=FBW-1-NS_sys_worldw;

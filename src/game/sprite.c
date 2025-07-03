@@ -5,6 +5,7 @@
  
 void sprite_del(struct sprite *sprite) {
   if (!sprite) return;
+  if (sprite==g.hero) g.hero=0;
   if (sprite->type->del) sprite->type->del(sprite);
   free(sprite);
 }
@@ -38,6 +39,8 @@ struct sprite *sprite_new(const struct sprite_type *type,double x,double y,uint3
     sprite_del(sprite);
     return 0;
   }
+  
+  if (type==&sprite_type_hero) g.hero=sprite;
   
   return sprite;
 }

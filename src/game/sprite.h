@@ -15,6 +15,7 @@ struct sprite {
   uint32_t arg;
   const uint8_t *cmdv;
   int cmdc;
+  int solid;
 };
 
 struct sprite_type {
@@ -24,6 +25,7 @@ struct sprite_type {
   int (*init)(struct sprite *sprite);
   void (*update)(struct sprite *sprite,double elapsed);
   void (*render)(struct sprite *sprite,int x,int y);
+  void (*bump)(struct sprite *sprite);
 };
 
 /* Prefer not to use del or new.

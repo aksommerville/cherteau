@@ -143,7 +143,31 @@ int egg_client_init() {
 }
 
 void egg_client_update(double elapsed) {
-  // TODO
+  g.pvinput=g.input;
+  g.input=egg_input_get_one(0);
+  if (g.input!=g.pvinput) {
+    if ((g.input&EGG_BTN_AUX3)&&!(g.pvinput&EGG_BTN_AUX3)) {
+      egg_terminate(0);//TODO return to main menu, don't terminate
+      return;
+    }
+    //TODO signal modals for input
+  }
+  
+  if (g.map) {
+    int i=g.spritec;
+    while (i-->0) {
+      struct sprite *sprite=g.spritev[i];
+      if (sprite->defunct) {
+        g.spritec--;
+        memmove(g.spritev+i,g.spritev+i+1,sizeof(void*)*(g.spritec-i));
+        sprite_del(sprite);
+      } else if (sprite->type->update) {
+        sprite->type->update(sprite,elapsed);
+      }
+    }
+  }
+
+  // TODO update general model
 }
 
 void egg_client_render() {
