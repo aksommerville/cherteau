@@ -22,6 +22,7 @@ struct modal_encounter {
   int msgc,msgp;
   double msgclock;
   struct rect msgr;
+  double coolclock; // Extra cool-down time between minigame end and reporting results. (Give them a sec to stop tapping keys, etc).
 };
 
 #define MODAL ((struct modal_encounter*)modal)
@@ -44,7 +45,8 @@ static int _encounter_init(struct modal *modal) {
   MODAL->startpulse=PULSE_COUNT;
   modal->opaque=0;
   
-  double difficulty=0.5;
+  double difficulty=0.200;
+  difficulty=(rand()&0xffff)/65535.0;
   const void *ctorv[]={
     minigame_new_karate,
     //minigame_new_dance,
@@ -119,12 +121,19 @@ static int _encounter_update(struct modal *modal,double elapsed) {
   
   // Detect establishment of outcome.
   if (MODAL->minigame->outcome&&!MODAL->outcome) {
+    MODAL->coolclock=1.000;
     MODAL->outcome=MODAL->minigame->outcome;
     if (MODAL->outcome>0) {
       encounter_win(modal);
     } else {
       encounter_lose(modal);
     }
+  }
+  
+  // Don't do any of the finishing stuff until coolclock chills fully.
+  if (MODAL->coolclock>0.0) {
+    MODAL->coolclock-=elapsed;
+    return 1;
   }
   
   // When the outcome established and message fully typewritten, SOUTH or WEST dismisses us.
@@ -178,7 +187,7 @@ static void _encounter_render(struct modal *modal) {
   
   /* If the outcome is established, draw the wrap-up message.
    */
-  if (MODAL->outcome) {
+  if (MODAL->outcome&&(MODAL->coolclock<=0.0)) {
     graf_draw_rect(&g.graf,MODAL->msgr.x,MODAL->msgr.y,MODAL->msgr.w,MODAL->msgr.h,0x000000ff);
     graf_flush(&g.graf);
     egg_draw_globals(0,0xff);

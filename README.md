@@ -28,7 +28,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [x] Trigger encounters.
 - [x] Transitions.
 
-- [ ] Karate chop contest.
+- [x] Karate chop contest.
 - [ ] Dance off.
 - [ ] Axe catching contest.
 - [ ] Jump rope contest.
@@ -46,5 +46,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [ ] Visual juice paying tolldoor.
 - [ ] Animate walking.
 - [ ] Animate bumping walls.
+- [ ] Karate: Facial expressions.
+- [ ] Karate: Indicator in power meter of required level. Or does that expose too much?
 
 - [ ] Itch page.
