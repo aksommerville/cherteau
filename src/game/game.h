@@ -9,6 +9,7 @@
 #include "egg_rom_toc.h"
 #include "shared_symbols.h"
 #include "sprite.h"
+#include "modal.h"
 
 #define FBW 320
 #define FBH 180
@@ -46,6 +47,7 @@ extern struct g {
   struct map *mapv; // by id; all resources, including invalid locations
   int mapc,mapa;
   
+  struct modal *modal; // If present, the outer world does not update.
   struct map *map; // WEAK, present during play.
   int hp,maxhp;
   int gold; // 0..999
@@ -57,6 +59,10 @@ extern struct g {
   int transition;
   double transition_clock;
   int transition_bits; // texture
+  int encodds; // 0..65535 odds of an encounter on the next step. Can go OOB.
+  int encoddsd; // Increase encodds on each step.
+  int encodds0;
+  int begin_encounter; // Hero sets this during her update to begin an encounter postcycle.
 } g;
 
 struct map *mapv_get(int rid);

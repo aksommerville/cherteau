@@ -57,11 +57,19 @@ static int enter_map(int rid,struct map *map,int dx,int dy) {
   }
   
   g.map=map;
+  g.encodds=g.encodds0=0;
+  g.encoddsd=0;
+  g.begin_encounter=0;
   
   struct rom_command_reader reader={.v=map->cmdv,.c=map->cmdc};
   struct rom_command cmd;
   while (rom_command_reader_next(&cmd,&reader)>0) {
     switch (cmd.opcode) {
+      case CMD_map_encodds: {
+          g.encodds0=(cmd.argv[0]<<8)|cmd.argv[1];
+          if (g.encodds0&0x8000) g.encodds0|=~0xffff;
+          g.encoddsd=(cmd.argv[2]<<8)|cmd.argv[3];
+        } break;
       case CMD_map_sprite: {
           double x=cmd.argv[0]+0.5;
           double y=cmd.argv[1]+0.5;
@@ -75,6 +83,7 @@ static int enter_map(int rid,struct map *map,int dx,int dy) {
         } break;
     }
   }
+  g.encodds=g.encodds0;
   
   return 0;
 }

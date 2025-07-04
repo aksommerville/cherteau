@@ -150,10 +150,14 @@ void egg_client_update(double elapsed) {
       egg_terminate(0);//TODO return to main menu, don't terminate
       return;
     }
-    //TODO signal modals for input
+    if (g.modal&&g.modal->type->input) g.modal->type->input(g.modal);
   }
-  
-  if (g.map) {
+  if (g.modal) {
+    if (!g.modal->type->update||(g.modal->type->update(g.modal,elapsed)<=0)) {
+      modal_del(g.modal);
+      g.modal=0;
+    }
+  } else if (g.map) {
     int i=g.spritec;
     while (i-->0) {
       struct sprite *sprite=g.spritev[i];
@@ -165,21 +169,28 @@ void egg_client_update(double elapsed) {
         sprite->type->update(sprite,elapsed);
       }
     }
+    if (g.begin_encounter) {
+      g.begin_encounter=0;
+      g.modal=modal_new(&modal_type_encounter);
+    } else {
+      if ((g.transition_clock-=elapsed)<=0.0) g.transition=0;
+      check_transitions();
+      // TODO other general model updates
+    }
   }
-
-  if ((g.transition_clock-=elapsed)<=0.0) g.transition=0;
-  check_transitions();
-  // TODO other general model updates
 }
 
 void egg_client_render() {
   int dstx,dsty,i;
   g.framec++;
   graf_reset(&g.graf);
-  
-  if (g.map) {
+  if (g.modal) {
+    if (g.map&&!g.modal->opaque) world_render();
+    if (g.modal->type->render) g.modal->type->render(g.modal);
+  } else if (g.map) {
     world_render();
+  } else {
+    graf_draw_rect(&g.graf,0,0,FBW,FBH,0x000000ff);
   }
-  
   graf_flush(&g.graf);
 }

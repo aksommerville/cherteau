@@ -59,32 +59,61 @@ static int walk_ok(const struct sprite *sprite,int dx,int dy,struct sprite **obs
   return 1;
 }
 
+/* Begin step.
+ */
+ 
+static void begin_step(struct sprite *sprite,int dx,int dy) {
+  SPRITE->walking=1;
+  SPRITE->qx+=dx;
+  SPRITE->qy+=dy;
+  SPRITE->dstx=SPRITE->qx+0.5;
+  SPRITE->dsty=SPRITE->qy+0.5;
+  add_toll(1);
+}
+
+static void end_step(struct sprite *sprite) {
+  sprite->x=SPRITE->dstx;
+  sprite->y=SPRITE->dsty;
+  SPRITE->walking=0;
+}
+
+/* Check encounters.
+ * If it's time for one, trigger it and return nonzero.
+ */
+ 
+static int check_encounters(struct sprite *sprite) {
+  if ((rand()&0xffff)<g.encodds) {
+    g.begin_encounter=1;
+    g.encodds=g.encodds0;
+    return 1;
+  }
+  g.encodds+=g.encoddsd;
+  return 0;
+}
+
 /* Update.
  */
 
 static void _hero_update(struct sprite *sprite,double elapsed) {
 
-  struct sprite *block;
+  struct sprite *block=0;
   if (SPRITE->walking) {
     #define AXISWALK(axis,dir,termcmp,btntag,dx,dy) { \
       sprite->axis+=dir*WALK_SPEED*elapsed; \
       if (sprite->axis termcmp SPRITE->dst##axis) { \
         if (g.input&EGG_BTN_##btntag) { \
-          if (walk_ok(sprite,dx,dy,&block)) { \
-            SPRITE->qx+=dx; \
-            SPRITE->qy+=dy; \
-            SPRITE->dstx+=dx; \
-            SPRITE->dsty+=dy; \
-            add_toll(1); \
+          if (check_encounters(sprite)) { \
+            end_step(sprite); \
+          } else if (walk_ok(sprite,dx,dy,&block)) { \
+            begin_step(sprite,dx,dy); \
           } else { \
-            sprite->axis=SPRITE->dst##axis; \
-            SPRITE->walking=0; \
+            end_step(sprite); \
             if (block&&block->type->bump) block->type->bump(block); \
             else egg_play_sound(RID_sound_walk_reject); \
           } \
         } else { \
-          sprite->axis=SPRITE->dst##axis; \
-          SPRITE->walking=0; \
+          end_step(sprite); \
+          check_encounters(sprite); \
         } \
       } \
     }
@@ -98,44 +127,28 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
     #undef AXISWALK
   } else switch (g.input&(EGG_BTN_LEFT|EGG_BTN_RIGHT|EGG_BTN_UP|EGG_BTN_DOWN)) {
     case EGG_BTN_LEFT: SPRITE->facedir=0x10; if (walk_ok(sprite,-1,0,&block)) {
-        SPRITE->walking=1;
-        SPRITE->dstx=sprite->x-1.0;
-        SPRITE->dsty=sprite->y;
-        SPRITE->qx--;
-        add_toll(1);
+        begin_step(sprite,-1,0);
       } else if (!(g.pvinput&EGG_BTN_LEFT)) {
         if (block&&block->type->bump) block->type->bump(block);
         else egg_play_sound(RID_sound_walk_reject);
       }
       break;
     case EGG_BTN_RIGHT: SPRITE->facedir=0x08; if (walk_ok(sprite,1,0,&block)) {
-        SPRITE->walking=1;
-        SPRITE->dstx=sprite->x+1.0;
-        SPRITE->dsty=sprite->y;
-        SPRITE->qx++;
-        add_toll(1);
+        begin_step(sprite,1,0);
       } else if (!(g.pvinput&EGG_BTN_RIGHT)) {
         if (block&&block->type->bump) block->type->bump(block);
         else egg_play_sound(RID_sound_walk_reject);
       }
       break;
     case EGG_BTN_UP: SPRITE->facedir=0x40; if (walk_ok(sprite,0,-1,&block)) {
-        SPRITE->walking=1;
-        SPRITE->dstx=sprite->x;
-        SPRITE->dsty=sprite->y-1.0;
-        SPRITE->qy--;
-        add_toll(1);
+        begin_step(sprite,0,-1);
       } else if (!(g.pvinput&EGG_BTN_UP)) {
         if (block&&block->type->bump) block->type->bump(block);
         else egg_play_sound(RID_sound_walk_reject);
       }
       break;
     case EGG_BTN_DOWN: SPRITE->facedir=0x02; if (walk_ok(sprite,0,1,&block)) {
-        SPRITE->walking=1;
-        SPRITE->dstx=sprite->x;
-        SPRITE->dsty=sprite->y+1.0;
-        SPRITE->qy++;
-        add_toll(1);
+        begin_step(sprite,0,1);
       } else if (!(g.pvinput&EGG_BTN_DOWN)) {
         if (block&&block->type->bump) block->type->bump(block);
         else egg_play_sound(RID_sound_walk_reject);

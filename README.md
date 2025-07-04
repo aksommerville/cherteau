@@ -25,7 +25,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [ ] Layers.
 - [x] Sprites.
 - [x] Toll doors.
-- [ ] Trigger encounters.
+- [x] Trigger encounters.
 - [x] Transitions.
 
 - [ ] Karate chop contest.
@@ -40,5 +40,11 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [ ] Hello.
 - [ ] Game over.
 - [ ] Victory.
+
+- [ ] "Visited" and "seen" maps in minimap.
+- [ ] Animate spending gold.
+- [ ] Visual juice paying tolldoor.
+- [ ] Animate walking.
+- [ ] Animate bumping walls.
 
 - [ ] Itch page.

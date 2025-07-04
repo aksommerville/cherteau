@@ -13,6 +13,7 @@
 
 #define CMD_map_image     0x20 /* u16:imageid */
 #define CMD_map_location  0x40 /* u8:long u8:lat u8:plane u8:reserved */
+#define CMD_map_encodds   0x41 /* s16:init u16:step */
 #define CMD_map_sprite    0x61 /* u16:pos u16:spriteid u32:arg */
 #define CMD_map_door      0x62 /* u16:pos u16:mapid u16:dstpos u16:reserved */
 
