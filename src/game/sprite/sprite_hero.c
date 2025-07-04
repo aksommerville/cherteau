@@ -1,6 +1,6 @@
 #include "game/game.h"
 
-#define WALK_SPEED 6.0 /* m/s */
+#define WALK_SPEED 5.0 /* m/s */
 
 /* Instance definition.
  */
@@ -144,6 +144,25 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
   }
 }
 
+/* Position changed from external force.
+ */
+ 
+static void _hero_position_changed(struct sprite *sprite) {
+  SPRITE->qx=(int)sprite->x;
+  SPRITE->qy=(int)sprite->y;
+  sprite->x=SPRITE->qx+0.5;
+  sprite->y=SPRITE->qy+0.5;
+  SPRITE->walking=0;
+  if (SPRITE->walking) {
+    switch (SPRITE->facedir) {
+      case 0x40: SPRITE->qy--; SPRITE->dsty=SPRITE->qy+0.5; break;
+      case 0x10: SPRITE->qx--; SPRITE->dstx=SPRITE->qx+0.5; break;
+      case 0x08: SPRITE->qx++; SPRITE->dstx=SPRITE->qx+0.5; break;
+      case 0x02: SPRITE->qy++; SPRITE->dsty=SPRITE->qy+0.5; break;
+    }
+  }
+}
+
 /* Render.
  */
 
@@ -169,4 +188,5 @@ const struct sprite_type sprite_type_hero={
   .init=_hero_init,
   .update=_hero_update,
   .render=_hero_render,
+  .position_changed=_hero_position_changed,
 };

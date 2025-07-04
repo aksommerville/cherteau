@@ -15,6 +15,13 @@
 
 #define TOLL_LIMIT 64
 
+#define TRANSITION_PAN_LEFT 1
+#define TRANSITION_PAN_RIGHT 2
+#define TRANSITION_PAN_UP 3
+#define TRANSITION_PAN_DOWN 4
+
+#define TRANSITION_TIME 0.400
+
 struct map {
   uint16_t rid;
   uint8_t lng,lat;
@@ -47,6 +54,9 @@ extern struct g {
   struct sprite *hero; // WEAK
   uint8_t tollv[TOLL_LIMIT]; // 0..99. Once they hit zero they stay zero.
   int tollc;
+  int transition;
+  double transition_clock;
+  int transition_bits; // texture
 } g;
 
 struct map *mapv_get(int rid);
@@ -54,6 +64,7 @@ int res_get(void *dstpp,int tid,int rid);
 
 int world_reset();
 void world_render();
+void check_transitions();
 
 /* Add (d) to any tolls currently visible.
  */

@@ -167,7 +167,9 @@ void egg_client_update(double elapsed) {
     }
   }
 
-  // TODO update general model
+  if ((g.transition_clock-=elapsed)<=0.0) g.transition=0;
+  check_transitions();
+  // TODO other general model updates
 }
 
 void egg_client_render() {

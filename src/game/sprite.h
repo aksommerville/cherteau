@@ -26,6 +26,7 @@ struct sprite_type {
   void (*update)(struct sprite *sprite,double elapsed);
   void (*render)(struct sprite *sprite,int x,int y);
   void (*bump)(struct sprite *sprite);
+  void (*position_changed)(struct sprite *sprite); // Notify that some other party moved me.
 };
 
 /* Prefer not to use del or new.
