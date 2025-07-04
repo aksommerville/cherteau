@@ -45,7 +45,7 @@ static int enter_map(int rid,struct map *map,int dx,int dy) {
   int i=g.spritec;
   while (i-->0) {
     struct sprite *sprite=g.spritev[i];
-    if (sprite->type==&sprite_type_hero) {
+    if ((sprite->type==&sprite_type_hero)&&!sprite->defunct) {
       sprite->x-=dx*NS_sys_mapw;
       sprite->y-=dy*NS_sys_maph;
       if (sprite->type->position_changed) sprite->type->position_changed(sprite);
@@ -97,6 +97,7 @@ int world_reset() {
   g.gold=400;
   memset(g.tollv,10,TOLL_LIMIT);
   g.tollc=TOLL_LIMIT;
+  if (g.hero) g.hero->defunct=1; // Normally enter_map() preserves the hero sprite. We want it dead.
   if (enter_map(RID_map_start,0,0,0)<0) return -1;
   return 0;
 }

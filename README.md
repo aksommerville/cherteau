@@ -11,7 +11,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 
 ## Agenda
 
-- Thu 3 July: Navigable outer world, placeholder combat, toll doors.
+- Thu 3 July: Navigable outer world, placeholder combat, toll doors. -OK
 - Fri 4 July: Mini games.
 - Sat 5 July: Full world, graphics.
 - Sun 6 July: Hello, game over, audio, polish.
@@ -22,7 +22,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [x] Placeholder graphics.
 - [x] Map loader.
 - [x] Session state. ...yeah yeah yeah, just dump everything in (g).
-- [ ] Layers.
+- [x] Layers.
 - [x] Sprites.
 - [x] Toll doors.
 - [x] Trigger encounters.

@@ -123,6 +123,7 @@ int egg_client_init() {
   if (font_add_image_resource(g.font,0x0020,RID_image_font9_0020)<0) return -1;
   if (egg_texture_load_image(g.texid_castle=egg_texture_new(),RID_image_castle)<0) return -1;
   if (egg_texture_load_image(g.texid_sprites=egg_texture_new(),RID_image_sprites)<0) return -1;
+  if (egg_texture_load_image(g.texid_tilefont=egg_texture_new(),RID_image_tilefont)<0) return -1;
   
   struct rom_reader reader={0};
   if (rom_reader_init(&reader,g.rom,g.romc)<0) return -1;
@@ -175,7 +176,10 @@ void egg_client_update(double elapsed) {
     } else {
       if ((g.transition_clock-=elapsed)<=0.0) g.transition=0;
       check_transitions();
-      // TODO other general model updates
+      if (g.hp<=0) {
+        fprintf(stderr,"%s:%d:TODO: Hero dead.\n",__FILE__,__LINE__);
+        world_reset();
+      }
     }
   }
 }

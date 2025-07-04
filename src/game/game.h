@@ -10,6 +10,7 @@
 #include "shared_symbols.h"
 #include "sprite.h"
 #include "modal.h"
+#include "minigame.h"
 
 #define FBW 320
 #define FBH 180
@@ -39,6 +40,7 @@ extern struct g {
   struct font *font;
   int texid_castle;
   int texid_sprites;
+  int texid_tilefont;
   uint8_t physics[256];
   int framec;
   int input,pvinput;
@@ -75,5 +77,12 @@ void check_transitions();
 /* Add (d) to any tolls currently visible.
  */
 void add_toll(int d);
+
+/* Break lines of text for display with (g.texid_tilefont).
+ * (bounds) will be filled with a box covering the text, plus a tasteful margin.
+ * We assume the entire framebuffer is available.
+ */
+struct rect { int x,y,w,h; };
+int break_text_tiles(struct egg_draw_tile *vtxv,int vtxa,struct rect *bounds,const char *src,int srcc);
 
 #endif
