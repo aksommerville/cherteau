@@ -31,7 +31,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [x] Karate chop contest.
 - [x] Dance off.
 - [x] Axe catching contest. ...nix it. I can't make it look good, and having second thoughts about the violence.
-- [ ] Jump rope contest.
+- [x] Jump rope contest.
 
 - [ ] Maps.
 - [ ] Final graphics.
@@ -46,8 +46,10 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [ ] Visual juice paying tolldoor.
 - [ ] Animate walking.
 - [ ] Animate bumping walls.
+- [ ] Karate: Fudge the mavg such that the first stroke creates visible activity in the meter.
 - [ ] Karate: Facial expressions.
 - [ ] Karate: Indicator in power meter of required level. Or does that expose too much?
+- [ ] Jumprope: Distraught faces when lost. And some decoration on the rope. An explosion?
 - [x] Dance off animates choppy native. Check `egg_audio_get_playhead`, are we estimating driver buffer position incorrectly?
 - - ...Pulse has its own buffer, and we asked it to set at 50 hz, while we thought it was 100 hz. Fixed, and it's a little less choppy now. Still not great.
 - [x] Is there a flash of random content when launching dance off? Or my eyes playing tricks on me...

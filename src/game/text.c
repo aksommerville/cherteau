@@ -85,7 +85,7 @@ int break_text_tiles(struct egg_draw_tile *vtxv,int vtxa,struct rect *bounds,con
   bounds->w+=5;
   bounds->h+=2;
   bounds->x=(FBW>>1)-(bounds->w>>1);
-  bounds->y=FBH-20-bounds->h; // 20 = arbitrary bottom margin
+  bounds->y=FBH-4-bounds->h; // 4 = arbitrary bottom margin
   struct egg_draw_tile *p=vtxv;
   int i=vtxc;
   for (;i-->0;p++) {

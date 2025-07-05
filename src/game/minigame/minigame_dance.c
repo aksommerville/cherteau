@@ -4,14 +4,14 @@
 #define PAST_WIDTH 40 /* Horizontal position of "now". */
 #define STRUCK_LEN 6 /* Track so many struck notes. We only need to remember them until they fall off the left edge. */
 #define STRIKE_RADIUS 100 /* How far away from a note can we strike it, in ms. (one point) */
-#define TWO_RADIUS 50 /* '' for two points */
-#define THREE_RADIUS 20 /* '' for three points */
-#define BIRD_RADIUS 80 /* Bird dances exactly to the music (and it's entirely decorative). Holds each frame for so long around each cue. */
+#define TWO_RADIUS 80 /* '' for two points */
+#define THREE_RADIUS 30 /* '' for three points */
+#define BIRD_RADIUS 100 /* Bird dances exactly to the music (and it's entirely decorative). Holds each frame for so long around each cue. */
 #define COMPLAIN_TIME 0.300
 #define CHEER_SPEED 30.0 /* px/s */
 #define CHEER_LIMIT 16
-#define REQ_LO 40 /* You have to really botch it to score this low. */
-#define REQ_HI 75 /* I consistently score right around 90. But I know lots of people have trouble with rhythm games, we're not all musicians. 75 is laughably easy. */
+#define REQ_LO 25 /* There are 37 notes in the song, and you can earn 1..3 points per note. Plus you can lose a point at any time. */
+#define REQ_HI 65 /* Highest possible score is 111. My record so far is 94. It might ask too much to require a 2-point-per-note average so stop a bit before that. */
 
 static const struct cue {
   int ms;
