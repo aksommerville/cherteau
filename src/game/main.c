@@ -124,6 +124,10 @@ int egg_client_init() {
   if (egg_texture_load_image(g.texid_castle=egg_texture_new(),RID_image_castle)<0) return -1;
   if (egg_texture_load_image(g.texid_sprites=egg_texture_new(),RID_image_sprites)<0) return -1;
   if (egg_texture_load_image(g.texid_tilefont=egg_texture_new(),RID_image_tilefont)<0) return -1;
+  if (egg_texture_load_raw(g.texid_minimap=egg_texture_new(),
+    MINIMAP_COLW*NS_sys_worldw,MINIMAP_ROWH*NS_sys_worldh,
+    MINIMAP_COLW*NS_sys_worldw*4,0,0
+  )<0) return -1;
   
   struct rom_reader reader={0};
   if (rom_reader_init(&reader,g.rom,g.romc)<0) return -1;

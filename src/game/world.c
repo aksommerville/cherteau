@@ -6,6 +6,77 @@
 
 static void world_render_diegetic(int dstx,int dsty,int skip_hero);
 
+/* Redraw minimap.
+ */
+ 
+static uint32_t minimap_tmp[MINIMAP_COLW*NS_sys_worldw*MINIMAP_ROWH*NS_sys_worldh];
+
+static void fill_rect(uint32_t *dstrow,int stride,int w,int h,uint32_t color) {
+  for (;h-->0;dstrow+=stride) {
+    uint32_t *dstp=dstrow;
+    int xi=w;
+    for (;xi-->0;dstp++) *dstp=color;
+  }
+}
+
+static int has_vacancy(const struct map *map,int x,int y,int w,int h) {
+  const uint8_t *rowp=map->cellv+y*NS_sys_mapw+x;
+  for (;h-->0;rowp+=NS_sys_mapw) {
+    const uint8_t *p=rowp;
+    int xi=w;
+    for (;xi-->0;p++) switch (g.physics[*p]) {
+      case NS_physics_vacant:
+      case NS_physics_safe:
+        return 1;
+    }
+  }
+  return 0;
+}
+
+static int has_neighbor(const struct map *map,int dx,int dy) {
+  // If the neighbor doesn't exist in g.maps_by_location, that's an easy "no".
+  int lng=map->lng+dx; if ((lng<0)||(lng>=NS_sys_worldw)) return 0;
+  int lat=map->lat+dy; if ((lat<0)||(lat>=NS_sys_worldh)) return 0;
+  // Tempting to leave it at that, but that would have us drawing doors where two neighbors are in fact not joined.
+  if ((dx<0)&&!has_vacancy(map,0,0,1,NS_sys_maph)) return 0;
+  if ((dx>0)&&!has_vacancy(map,NS_sys_mapw-1,0,1,NS_sys_maph)) return 0;
+  if ((dy<0)&&!has_vacancy(map,0,0,NS_sys_mapw,1)) return 0;
+  if ((dy>0)&&!has_vacancy(map,0,NS_sys_maph-1,NS_sys_mapw,1)) return 0;
+  return 1;
+}
+
+static void redraw_minimap_1(uint32_t *dstrow,const struct map *map) {
+  int stride=MINIMAP_COLW*NS_sys_worldw; // stride in words
+  fill_rect(dstrow,stride,MINIMAP_COLW,MINIMAP_ROWH,0x00000000);
+  if (!map||!map->visited) return;
+  const uint32_t roomcolor=0xff808080;
+  const uint32_t doorcolor=0xffa0a0a0;
+  fill_rect(dstrow+stride+1,stride,MINIMAP_COLW-2,MINIMAP_ROWH-2,roomcolor);
+  int mblp=map->lat*NS_sys_worldw+map->lng;
+  if (has_neighbor(map,-1,0)) fill_rect(dstrow+(MINIMAP_ROWH>>1)*stride,0,1,1,doorcolor);
+  if (has_neighbor(map,1,0)) fill_rect(dstrow+MINIMAP_COLW-1+(MINIMAP_ROWH>>1)*stride,0,1,1,doorcolor);
+  if (has_neighbor(map,0,-1)) fill_rect(dstrow+(MINIMAP_COLW>>1),0,1,1,doorcolor);
+  if (has_neighbor(map,0,1)) fill_rect(dstrow+(MINIMAP_COLW>>1)+(MINIMAP_ROWH-1)*stride,0,1,1,doorcolor);
+}
+ 
+static void redraw_minimap() {
+  struct map **mapp=g.maps_by_location;
+  uint32_t *dstrow=minimap_tmp;
+  int w=MINIMAP_COLW*NS_sys_worldw;
+  int h=MINIMAP_ROWH*NS_sys_worldh;
+  int longstride=MINIMAP_COLW*NS_sys_worldw*MINIMAP_ROWH;
+  int shortstride=MINIMAP_COLW;
+  int rowi=NS_sys_worldh;
+  for (;rowi-->0;dstrow+=longstride) {
+    uint32_t *dstp=dstrow;
+    int coli=NS_sys_worldw;
+    for (;coli-->0;dstp+=shortstride,mapp++) {
+      redraw_minimap_1(dstp,*mapp);
+    }
+  }
+  egg_texture_load_raw(g.texid_minimap,w,h,w*4,minimap_tmp,sizeof(minimap_tmp));
+}
+
 /* Generate the transition texture if we need it, and draw the world into it.
  */
  
@@ -30,6 +101,11 @@ static int enter_map(int rid,struct map *map,int dx,int dy) {
       fprintf(stderr,"map:%d not found\n",rid);
       return -1;
     }
+  }
+  
+  if (!map->visited) {
+    map->visited=1;
+    redraw_minimap();
   }
   
   g.transition=0;
@@ -60,15 +136,36 @@ static int enter_map(int rid,struct map *map,int dx,int dy) {
   g.encodds=g.encodds0=0;
   g.encoddsd=0;
   g.begin_encounter=0;
+  g.poic=0;
   
   struct rom_command_reader reader={.v=map->cmdv,.c=map->cmdc};
   struct rom_command cmd;
   while (rom_command_reader_next(&cmd,&reader)>0) {
     switch (cmd.opcode) {
+      case CMD_map_gameover: {
+          uint8_t x=cmd.argv[0],y=cmd.argv[1];
+          if ((x<NS_sys_mapw)&&(y<NS_sys_maph)&&(g.poic<POI_LIMIT)) {
+            g.poiv[g.poic++]=cmd;
+          }
+        } break;
       case CMD_map_encodds: {
           g.encodds0=(cmd.argv[0]<<8)|cmd.argv[1];
           if (g.encodds0&0x8000) g.encodds0|=~0xffff;
           g.encoddsd=(cmd.argv[2]<<8)|cmd.argv[3];
+        } break;
+      case CMD_map_treasure: {
+          uint8_t x=cmd.argv[0],y=cmd.argv[1];
+          if ((x<NS_sys_mapw)&&(y<NS_sys_maph)) {
+            int trid=(cmd.argv[2]<<8)|cmd.argv[3];
+            if ((trid<g.treasurec)&&g.treasurev[trid]) {
+              map->cellv[y*NS_sys_mapw+x]=map->rocellv[y*NS_sys_mapw+x];
+              if (g.poic<POI_LIMIT) {
+                g.poiv[g.poic++]=cmd;
+              }
+            } else {
+              map->cellv[y*NS_sys_mapw+x]=map->rocellv[y*NS_sys_mapw+x]+1;
+            }
+          }
         } break;
       case CMD_map_sprite: {
           double x=cmd.argv[0]+0.5;
@@ -92,11 +189,23 @@ static int enter_map(int rid,struct map *map,int dx,int dy) {
  */
  
 int world_reset() {
-  g.hp=4;
-  g.maxhp=8;
-  g.gold=400;
+  g.hp=5;
+  g.maxhp=5;
+  g.gold=0;
+  
+  struct map *map=g.mapv;
+  int i=g.mapc;
+  for (;i-->0;map++) {
+    memcpy(map->cellv,map->rocellv,sizeof(map->cellv));
+    map->visited=0;
+  }
+  
+  // TODO Treasures and tolls probably shouldn't all be the same value initially.
   memset(g.tollv,10,TOLL_LIMIT);
   g.tollc=TOLL_LIMIT;
+  memset(g.treasurev,100,TREASURE_LIMIT);
+  g.treasurec=TREASURE_LIMIT;
+  
   if (g.hero) g.hero->defunct=1; // Normally enter_map() preserves the hero sprite. We want it dead.
   egg_play_song(RID_song_lock_me_away,0,1);
   if (enter_map(RID_map_start,0,0,0)<0) return -1;
@@ -168,10 +277,14 @@ void world_render() {
   graf_draw_tile(&g.graf,g.texid_sprites,30,15,0x30+g.gold%10,0);
   
   // Minimap on the right side of the header.
-  dstx=FBW-1-NS_sys_worldw;
-  dsty=1;
-  graf_draw_rect(&g.graf,dstx,dsty,NS_sys_worldw,NS_sys_worldh,0x404040ff);
-  graf_draw_rect(&g.graf,dstx+g.map->lng,dsty+g.map->lat,1,1,(g.framec&16)?0xffffffff:0xff8000ff);
+  int mmw=MINIMAP_COLW*NS_sys_worldw;
+  int mmh=MINIMAP_ROWH*NS_sys_worldh;
+  dstx=FBW-mmw;
+  dsty=0;
+  graf_draw_decal(&g.graf,g.texid_minimap,dstx,dsty,0,0,mmw,mmh,0);
+  dstx+=g.map->lng*MINIMAP_COLW+1;
+  dsty+=g.map->lat*MINIMAP_ROWH+1;
+  graf_draw_rect(&g.graf,dstx,dsty,MINIMAP_COLW-2,MINIMAP_ROWH-2,(g.framec&16)?0xffc020ff:0xff8000ff);
 }
 
 /* Check transitions.

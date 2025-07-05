@@ -1,0 +1,24 @@
+Treasures and tolls, and similar things that we're not naming but might need to keep track of.
+
+=== TOLL ===
+1 start
+2 map:5, north of start
+3 ''
+4 ''
+5 map:2, long and short path
+6 map:7, three choices
+7 ''
+8 ''
+9 map:6
+10 map:4
+11 map:3, south of start
+12 map:3, carpet access
+13 map:10
+14 map:10
+15 map:11 clearly pointless
+16 map:11
+
+=== TREASURE ===
+0 start
+1 map:1, north of start
+2 map:4, "not much of a maze"

@@ -68,6 +68,10 @@ static void begin_step(struct sprite *sprite,int dx,int dy) {
   SPRITE->qy+=dy;
   SPRITE->dstx=SPRITE->qx+0.5;
   SPRITE->dsty=SPRITE->qy+0.5;
+  if ((SPRITE->qx>=0)&&(SPRITE->qy>=0)&&(SPRITE->qx<NS_sys_mapw)&&(SPRITE->qy<NS_sys_maph)) {
+    uint8_t physics=g.physics[g.map->cellv[SPRITE->qy*NS_sys_mapw+SPRITE->qx]];
+    if (physics==NS_physics_safe) return;
+  }
   add_toll(1);
 }
 
@@ -75,6 +79,27 @@ static void end_step(struct sprite *sprite) {
   sprite->x=SPRITE->dstx;
   sprite->y=SPRITE->dsty;
   SPRITE->walking=0;
+  const struct rom_command *poi=g.poiv;
+  int i=g.poic;
+  for (;i-->0;poi++) {
+    if (poi->argv[0]!=SPRITE->qx) continue;
+    if (poi->argv[1]!=SPRITE->qy) continue;
+    switch (poi->opcode) {
+      case CMD_map_gameover: {
+          fprintf(stderr,"!!! Game over !!! %s:%d\n",__FILE__,__LINE__);
+        } break;
+      case CMD_map_treasure: {
+          int trid=(poi->argv[2]<<8)|poi->argv[3];
+          if ((trid<g.treasurec)&&g.treasurev[trid]) {
+            if ((g.gold+=g.treasurev[trid])>999) g.gold=999;
+            g.treasurev[trid]=0;
+            g.map->cellv[SPRITE->qy*NS_sys_mapw+SPRITE->qx]=g.map->rocellv[SPRITE->qy*NS_sys_mapw+SPRITE->qx]+1;
+            egg_play_sound(RID_sound_gold);
+            //TODO dialogue box
+          }
+        } break;
+    }
+  }
 }
 
 /* Check encounters.
@@ -82,6 +107,10 @@ static void end_step(struct sprite *sprite) {
  */
  
 static int check_encounters(struct sprite *sprite) {
+  if ((SPRITE->qx>=0)&&(SPRITE->qy>=0)&&(SPRITE->qx<NS_sys_mapw)&&(SPRITE->qy<NS_sys_maph)) {
+    uint8_t physics=g.physics[g.map->cellv[SPRITE->qy*NS_sys_mapw+SPRITE->qx]];
+    if (physics==NS_physics_safe) return 0;
+  }
   if ((rand()&0xffff)<g.encodds) {
     g.begin_encounter=1;
     g.encodds=g.encodds0;

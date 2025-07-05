@@ -33,7 +33,12 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [x] Axe catching contest. ...nix it. I can't make it look good, and having second thoughts about the violence.
 - [x] Jump rope contest.
 
-- [ ] Maps.
+- [x] Treasure chests.
+- [ ] Fairies: Present like minigames, but you can't lose. Free coins or heart, all you have to do is catch it.
+- [x] Safety carpet
+- [ ] Treadle doors.
+
+- [x] Maps.
 - [ ] Final graphics.
 - [ ] Music.
 - [ ] Sound effects.
@@ -46,9 +51,11 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [ ] Visual juice paying tolldoor.
 - [ ] Animate walking.
 - [ ] Animate bumping walls.
+- [ ] Karate: Foe should get the same thing as you, and should use exactly enough power to break it.
 - [ ] Karate: Fudge the mavg such that the first stroke creates visible activity in the meter.
 - [ ] Karate: Facial expressions.
 - [ ] Karate: Indicator in power meter of required level. Or does that expose too much?
+- [ ] Dance: At the end, I keep wanting to press A and proceed, before the "You win" message.
 - [ ] Jumprope: Distraught faces when lost. And some decoration on the rope. An explosion?
 - [x] Dance off animates choppy native. Check `egg_audio_get_playhead`, are we estimating driver buffer position incorrectly?
 - - ...Pulse has its own buffer, and we asked it to set at 50 hz, while we thought it was 100 hz. Fixed, and it's a little less choppy now. Still not great.

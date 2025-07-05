@@ -16,6 +16,8 @@
 #define FBH 180
 
 #define TOLL_LIMIT 64
+#define TREASURE_LIMIT 32
+#define POI_LIMIT 32
 
 #define TRANSITION_PAN_LEFT 1
 #define TRANSITION_PAN_RIGHT 2
@@ -24,6 +26,14 @@
 
 #define TRANSITION_TIME 0.400
 
+/* Don't change arbitrarily.
+ * (FBH-NS_sys_tilesize*NS_sys_maph)==20, and NS_sys_worldw is 4.
+ * So 5 pixels vertically fits the header bar exactly. And we'll never touch the edge pixels of the minimap, so its outline is preserved too.
+ * Horizontally, we have some slack. Keep it odd, and I guess aim for either 1x or 2x of the height.
+ */
+#define MINIMAP_COLW 9
+#define MINIMAP_ROWH 5
+
 struct map {
   uint16_t rid;
   uint8_t lng,lat;
@@ -31,6 +41,7 @@ struct map {
   uint8_t cellv[NS_sys_mapw*NS_sys_maph];
   const uint8_t *cmdv;
   int cmdc;
+  int visited;
 };
 
 extern struct g {
@@ -51,6 +62,9 @@ extern struct g {
   
   struct modal *modal; // If present, the outer world does not update.
   struct map *map; // WEAK, present during play.
+  struct rom_command poiv[POI_LIMIT]; // Selected commands from this map.
+  int texid_minimap;
+  int poic;
   int hp,maxhp;
   int gold; // 0..999
   struct sprite **spritev;
@@ -58,6 +72,8 @@ extern struct g {
   struct sprite *hero; // WEAK
   uint8_t tollv[TOLL_LIMIT]; // 0..99. Once they hit zero they stay zero.
   int tollc;
+  uint8_t treasurev[TREASURE_LIMIT];
+  int treasurec;
   int transition;
   double transition_clock;
   int transition_bits; // texture
