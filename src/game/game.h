@@ -81,6 +81,7 @@ extern struct g {
   int encoddsd; // Increase encodds on each step.
   int encodds0;
   int begin_encounter; // Hero sets this during her update to begin an encounter postcycle.
+  int flagv[FLAG_COUNT];
 } g;
 
 struct map *mapv_get(int rid);
@@ -100,5 +101,7 @@ void add_toll(int d);
  */
 struct rect { int x,y,w,h; };
 int break_text_tiles(struct egg_draw_tile *vtxv,int vtxa,struct rect *bounds,const char *src,int srcc);
+
+int set_flag(int flagid,int v); // => nonzero if changed
 
 #endif

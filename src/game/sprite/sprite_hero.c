@@ -98,6 +98,10 @@ static void end_step(struct sprite *sprite) {
             //TODO dialogue box
           }
         } break;
+      case CMD_map_treadle1: {
+          int flagid=(poi->argv[2]<<8)|poi->argv[3];
+          if (set_flag(flagid,1)) egg_play_sound(RID_sound_treadle);
+        } break;
     }
   }
 }

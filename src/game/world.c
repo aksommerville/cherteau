@@ -167,6 +167,31 @@ static int enter_map(int rid,struct map *map,int dx,int dy) {
             }
           }
         } break;
+      case CMD_map_treadle1: {
+          uint8_t x=cmd.argv[0],y=cmd.argv[1];
+          int flagid=(cmd.argv[2]<<8)|cmd.argv[3];
+          if ((x<NS_sys_mapw)&&(y<NS_sys_maph)) {
+            if ((flagid<FLAG_COUNT)&&g.flagv[flagid]) {
+              map->cellv[y*NS_sys_mapw+x]=map->rocellv[y*NS_sys_mapw+x]+1;
+            } else {
+              map->cellv[y*NS_sys_mapw+x]=map->rocellv[y*NS_sys_mapw+x];
+              if (g.poic<POI_LIMIT) {
+                g.poiv[g.poic++]=cmd;
+              }
+            }
+          }
+        } break;
+      case CMD_map_switchable: {
+          uint8_t x=cmd.argv[0],y=cmd.argv[1];
+          int flagid=(cmd.argv[2]<<8)|cmd.argv[3];
+          if ((x<NS_sys_mapw)&&(y<NS_sys_maph)) {
+            if ((flagid<FLAG_COUNT)&&g.flagv[flagid]) {
+              map->cellv[y*NS_sys_mapw+x]=map->rocellv[y*NS_sys_mapw+x]+1;
+            } else {
+              map->cellv[y*NS_sys_mapw+x]=map->rocellv[y*NS_sys_mapw+x];
+            }
+          }
+        } break;
       case CMD_map_sprite: {
           double x=cmd.argv[0]+0.5;
           double y=cmd.argv[1]+0.5;
@@ -192,6 +217,8 @@ int world_reset() {
   g.hp=5;
   g.maxhp=5;
   g.gold=0;
+  memset(g.flagv,0,sizeof(g.flagv));
+  g.flagv[1]=1;
   
   struct map *map=g.mapv;
   int i=g.mapc;
@@ -306,4 +333,35 @@ void check_transitions() {
   if ((g.hero->x>NS_sys_mapw)&&check_transition_1(1,0)) return;
   if ((g.hero->y<0.0)&&check_transition_1(0,-1)) return;
   if ((g.hero->y>NS_sys_maph)&&check_transition_1(0,1)) return;
+}
+
+/* Set flag, with side effects and everything.
+ */
+ 
+int set_flag(int flagid,int v) {
+  if ((flagid<2)||(flagid>=FLAG_COUNT)) return 0; // sic "<2", the first 2 are read-only
+  if (g.flagv[flagid]==v) return 0;
+  g.flagv[flagid]=v;
+  
+  if (!g.map) return 1;
+  struct rom_command_reader reader={.v=g.map->cmdv,.c=g.map->cmdc};
+  struct rom_command cmd;
+  while (rom_command_reader_next(&cmd,&reader)>0) {
+    switch (cmd.opcode) {
+      case CMD_map_treadle1:
+      case CMD_map_switchable: {
+          int cflagid=(cmd.argv[2]<<8)|cmd.argv[3];
+          if (cflagid!=flagid) break;
+          uint8_t x=cmd.argv[0],y=cmd.argv[1];
+          if ((x<NS_sys_mapw)&&(y<NS_sys_maph)) {
+            if (v) {
+              g.map->cellv[y*NS_sys_mapw+x]=g.map->rocellv[y*NS_sys_mapw+x]+1;
+            } else {
+              g.map->cellv[y*NS_sys_mapw+x]=g.map->rocellv[y*NS_sys_mapw+x];
+            }
+          }
+        } break;
+    }
+  }
+  return 1;
 }

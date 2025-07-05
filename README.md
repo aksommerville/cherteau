@@ -36,7 +36,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [x] Treasure chests.
 - [ ] Fairies: Present like minigames, but you can't lose. Free coins or heart, all you have to do is catch it.
 - [x] Safety carpet
-- [ ] Treadle doors.
+- [x] Treadle doors.
 
 - [x] Maps.
 - [ ] Final graphics.
