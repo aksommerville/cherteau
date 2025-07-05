@@ -322,5 +322,7 @@ struct minigame *minigame_new_dance(double difficulty) {
   
   MINIGAME->reqscore=(int)(REQ_LO*(1.0-difficulty)+REQ_HI*difficulty);
   
+  _dance_update(minigame,0.016,0,0);
+  
   return minigame;
 }

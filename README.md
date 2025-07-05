@@ -12,7 +12,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 ## Agenda
 
 - Thu 3 July: Navigable outer world, placeholder combat, toll doors. -OK
-- Fri 4 July: Mini games.
+- Fri 4 July: Mini games. -2/4
 - Sat 5 July: Full world, graphics.
 - Sun 6 July: Hello, game over, audio, polish.
 - Submissions open until noon Monday. Submit by EOD Sunday.
@@ -30,7 +30,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 
 - [x] Karate chop contest.
 - [x] Dance off.
-- [ ] Axe catching contest.
+- [x] Axe catching contest. ...nix it. I can't make it look good, and having second thoughts about the violence.
 - [ ] Jump rope contest.
 
 - [ ] Maps.
@@ -48,7 +48,9 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [ ] Animate bumping walls.
 - [ ] Karate: Facial expressions.
 - [ ] Karate: Indicator in power meter of required level. Or does that expose too much?
-- [ ] Dance off animates choppy native. Check `egg_audio_get_playhead`, are we estimating driver buffer position incorrectly?
-- [ ] Is there a flash of random content when launching dance off? Or my eyes playing tricks on me...
+- [x] Dance off animates choppy native. Check `egg_audio_get_playhead`, are we estimating driver buffer position incorrectly?
+- - ...Pulse has its own buffer, and we asked it to set at 50 hz, while we thought it was 100 hz. Fixed, and it's a little less choppy now. Still not great.
+- [x] Is there a flash of random content when launching dance off? Or my eyes playing tricks on me...
+- - ...yes. We need to ensure it updates before the first render.
 
 - [ ] Itch page.

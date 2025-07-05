@@ -21,7 +21,6 @@ struct minigame {
 
 struct minigame *minigame_new_karate(double difficulty);
 struct minigame *minigame_new_dance(double difficulty);
-struct minigame *minigame_new_axe(double difficulty);
 struct minigame *minigame_new_jumprope(double difficulty);
 
 #endif
