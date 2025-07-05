@@ -29,7 +29,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [x] Transitions.
 
 - [x] Karate chop contest.
-- [ ] Dance off.
+- [x] Dance off.
 - [ ] Axe catching contest.
 - [ ] Jump rope contest.
 
@@ -48,5 +48,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [ ] Animate bumping walls.
 - [ ] Karate: Facial expressions.
 - [ ] Karate: Indicator in power meter of required level. Or does that expose too much?
+- [ ] Dance off animates choppy native. Check `egg_audio_get_playhead`, are we estimating driver buffer position incorrectly?
+- [ ] Is there a flash of random content when launching dance off? Or my eyes playing tricks on me...
 
 - [ ] Itch page.

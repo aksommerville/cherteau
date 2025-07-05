@@ -49,7 +49,7 @@ static int _encounter_init(struct modal *modal) {
   difficulty=(rand()&0xffff)/65535.0;
   const void *ctorv[]={
     minigame_new_karate,
-    //minigame_new_dance,
+    minigame_new_dance,
     //minigame_new_axe,
     //minigame_new_jumprope,
   };

@@ -98,6 +98,7 @@ int world_reset() {
   memset(g.tollv,10,TOLL_LIMIT);
   g.tollc=TOLL_LIMIT;
   if (g.hero) g.hero->defunct=1; // Normally enter_map() preserves the hero sprite. We want it dead.
+  egg_play_song(RID_song_lock_me_away,0,1);
   if (enter_map(RID_map_start,0,0,0)<0) return -1;
   return 0;
 }

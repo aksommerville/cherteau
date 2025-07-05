@@ -42,6 +42,7 @@ struct minigame_karate {
  */
  
 static void _karate_del(struct minigame *minigame) {
+  egg_play_song(RID_song_lock_me_away,0,1);
   egg_texture_del(MINIGAME->texid);
   free(minigame);
 }
@@ -369,6 +370,8 @@ struct minigame *minigame_new_karate(double difficulty) {
   for (;i-->0;p++) *p=-10.0;
   
   MINIGAME->playclock=9.0;
+  
+  egg_play_song(RID_song_even_tippier_toe,0,1);
   
   return minigame;
 }
