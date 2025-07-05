@@ -34,11 +34,12 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [x] Jump rope contest.
 
 - [x] Treasure chests.
-- [ ] Fairies: Present like minigames, but you can't lose. Free coins or heart, all you have to do is catch it.
+- [x] Fairies: Present like minigames, but you can't lose. Free coins or heart, all you have to do is catch it.
 - [x] Safety carpet
 - [x] Treadle doors.
 
 - [x] Maps.
+- [ ] Difficulty per map.
 - [ ] Final graphics.
 - [ ] Music.
 - [ ] Sound effects.
@@ -56,6 +57,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [ ] Karate: Facial expressions.
 - [ ] Karate: Indicator in power meter of required level. Or does that expose too much?
 - [ ] Dance: At the end, I keep wanting to press A and proceed, before the "You win" message.
+- [ ] Dance: Hihat a bit louder.
 - [ ] Jumprope: Distraught faces when lost. And some decoration on the rope. An explosion?
 - [x] Dance off animates choppy native. Check `egg_audio_get_playhead`, are we estimating driver buffer position incorrectly?
 - - ...Pulse has its own buffer, and we asked it to set at 50 hz, while we thought it was 100 hz. Fixed, and it's a little less choppy now. Still not great.

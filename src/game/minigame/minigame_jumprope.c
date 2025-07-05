@@ -19,6 +19,9 @@ struct minigame_jumprope {
   double lpower; // Amount of jump force remaining
   double rtrack; // Rabbit's opinion of the rope's phase.
   double rpower;
+  int santa_mode;
+  uint8_t prize;
+  double xmasclock;
 };
 
 #define MINIGAME ((struct minigame_jumprope*)minigame)
@@ -120,6 +123,17 @@ static void _jumprope_update(struct minigame *minigame,double elapsed,int input,
   if (!MINIGAME->started) {
     MINIGAME->started=1;
     egg_play_song(RID_song_even_tippier_toe,0,1);
+  }
+  
+  // In Santa mode, it all just runs on a timer.
+  // The fancier bits are all in render, we just tick the clock and signal completion.
+  if (MINIGAME->santa_mode) {
+    MINIGAME->xmasclock+=elapsed;
+    if ((input&EGG_BTN_SOUTH)&&!(pvinput&EGG_BTN_SOUTH)) MINIGAME->xmasclock=5.0;
+    if (MINIGAME->xmasclock>=4.0) {
+      minigame->outcome=1;
+    }
+    return;
   }
   
   // The game ends when one score goes negative or exceeds 99.
@@ -236,6 +250,45 @@ static void draw_jumper(struct minigame *minigame,int dstx,int srcx,int srcy,int
   graf_draw_decal(&g.graf,MINIGAME->texid,dstx,dsty,srcx,srcy,w,h,0);
 }
 
+/* Santa mode.
+ * Draws Dot, Santa, and the prize.
+ * Caller should draw background, scoreboard, and the armless refs as usual.
+ */
+ 
+static void draw_xmas(struct minigame *minigame) {
+  draw_jumper(minigame,100,135,33,35,58,MINIGAME->ljump);
+  
+  int santax=180;
+  int santay=Y_FLOOR-61;
+  graf_draw_decal(&g.graf,MINIGAME->texid,santax,santay,143,92,63,61,0);
+  if (MINIGAME->xmasclock>3.000) {
+    // ok done throwing it, arm disappears
+  } else if (MINIGAME->xmasclock>2.000) {
+    // throwing it
+    graf_draw_decal(&g.graf,MINIGAME->texid,santax+12,santay+14,207,85,19,18,0);
+  } else if (MINIGAME->xmasclock>1.000) {
+    // brandishing
+    graf_draw_decal(&g.graf,MINIGAME->texid,santax+13,santay+26,207,76,17,8,0);
+    graf_draw_tile(&g.graf,MINIGAME->texid,santax+11,santay+28,MINIGAME->prize,0);
+  }
+  
+  // Gift in flight.
+  if ((MINIGAME->xmasclock>2.000)&&(MINIGAME->xmasclock<4.000)) {
+    const double arch=60.0;
+    double y0=santay+28.0;
+    double xa=santax+11.0;
+    double xz=120.0;
+    double t=(MINIGAME->xmasclock-2.000)/2.000;
+    if (t<0.0) t=0.0; else if (t>1.0) t=1.0;
+    double x=xa*(1.0-t)+xz*t;
+    double y=(t-0.5)*2.0;
+    y*=y;
+    y*=arch;
+    y=y0-(arch-y);
+    graf_draw_tile(&g.graf,MINIGAME->texid,(int)x,(int)y,MINIGAME->prize,0);
+  }
+}
+
 /* Render.
  */
  
@@ -247,7 +300,9 @@ static void _jumprope_render(struct minigame *minigame) {
   
   // Draw the rope before the jumpers when it's behind (ie <0.5)
   int ropey;
-  if (MINIGAME->rope<0.5) {
+  if (MINIGAME->santa_mode) {
+    draw_xmas(minigame);
+  } else if (MINIGAME->rope<0.5) {
     ropey=draw_rope(minigame);
     graf_flush(&g.graf);
     draw_jumper(minigame,100,135,33,35,58,MINIGAME->ljump);
@@ -258,17 +313,19 @@ static void _jumprope_render(struct minigame *minigame) {
     ropey=draw_rope(minigame);
   }
   
-  int yhi=Y_FLOOR-(Y_RANGE>>2);
-  int ylo=Y_FLOOR-((Y_RANGE*3)>>2);
-  if (ropey<=ylo) { // high rope
-    graf_draw_decal(&g.graf,MINIGAME->texid,24,ropey-2,21,41,15,15,0);
-    graf_draw_decal(&g.graf,MINIGAME->texid,FBW-24-15,ropey-2,21,41,15,15,EGG_XFORM_XREV);
-  } else if (ropey>=yhi) { // low rope
-    graf_draw_decal(&g.graf,MINIGAME->texid,24,ropey-12,21,41,15,15,EGG_XFORM_YREV);
-    graf_draw_decal(&g.graf,MINIGAME->texid,FBW-24-15,ropey-12,21,41,15,15,EGG_XFORM_YREV|EGG_XFORM_XREV);
-  } else { // middle rope
-    graf_draw_decal(&g.graf,MINIGAME->texid,22,ropey-2,21,33,18,7,0);
-    graf_draw_decal(&g.graf,MINIGAME->texid,FBW-22-18,ropey-2,21,33,18,7,EGG_XFORM_XREV);
+  if (!MINIGAME->santa_mode) { // In Santa mode, the refs have no far hand, and there's no rope.
+    int yhi=Y_FLOOR-(Y_RANGE>>2);
+    int ylo=Y_FLOOR-((Y_RANGE*3)>>2);
+    if (ropey<=ylo) { // high rope
+      graf_draw_decal(&g.graf,MINIGAME->texid,24,ropey-2,21,41,15,15,0);
+      graf_draw_decal(&g.graf,MINIGAME->texid,FBW-24-15,ropey-2,21,41,15,15,EGG_XFORM_XREV);
+    } else if (ropey>=yhi) { // low rope
+      graf_draw_decal(&g.graf,MINIGAME->texid,24,ropey-12,21,41,15,15,EGG_XFORM_YREV);
+      graf_draw_decal(&g.graf,MINIGAME->texid,FBW-24-15,ropey-12,21,41,15,15,EGG_XFORM_YREV|EGG_XFORM_XREV);
+    } else { // middle rope
+      graf_draw_decal(&g.graf,MINIGAME->texid,22,ropey-2,21,33,18,7,0);
+      graf_draw_decal(&g.graf,MINIGAME->texid,FBW-22-18,ropey-2,21,33,18,7,EGG_XFORM_XREV);
+    }
   }
   graf_draw_decal(&g.graf,MINIGAME->texid,10,Y_FLOOR-64,1,33,19,65,0);
   graf_draw_decal(&g.graf,MINIGAME->texid,FBW-10-19,Y_FLOOR-64,1,33,19,65,EGG_XFORM_XREV);
@@ -276,6 +333,8 @@ static void _jumprope_render(struct minigame *minigame) {
 
 /* New.
  */
+ 
+static const char *santa_name="santa"; // stable address; we'll use for identification
  
 struct minigame *minigame_new_jumprope(double difficulty) {
   struct minigame *minigame=calloc(1,sizeof(struct minigame_jumprope));
@@ -285,6 +344,14 @@ struct minigame *minigame_new_jumprope(double difficulty) {
   minigame->update=_jumprope_update;
   minigame->render=_jumprope_render;
   minigame->difficulty=(difficulty<=0.0)?0.0:(difficulty>=1.0)?1.0:difficulty;
+  
+  if (difficulty<0.0) {
+    minigame->name=santa_name;
+    MINIGAME->santa_mode=1;
+    if (g.hp<g.maxhp) MINIGAME->prize=0x00; // heart
+    else if (g.gold<999) MINIGAME->prize=0x01; // ten bucks
+    else MINIGAME->prize=0x02; // candy cane (noop)
+  }
   
   MINIGAME->velocity=0.250;
   MINIGAME->veld=0.010+0.050*difficulty;
@@ -307,4 +374,28 @@ struct minigame *minigame_new_jumprope(double difficulty) {
   redraw_scoreboard(minigame);
   
   return minigame;
+}
+
+/* Get user message in santa mode, and do the thing we talk about.
+ */
+ 
+static int is_santa(const struct minigame *minigame) {
+  if (!minigame) return 0;
+  if (minigame->name==santa_name) return 1;
+  return 0;
+}
+ 
+int minigame_santa_get_message(char *dst,int dsta,struct minigame *minigame) {
+  if (!is_santa(minigame)) return 0;
+  switch (MINIGAME->prize) {
+    case 0x00: {
+        if ((g.hp+=1)>g.maxhp) g.hp=g.maxhp;
+        return strings_format(dst,dsta,1,6,0,0);
+      }
+    case 0x01: {
+        if ((g.gold+=10)>999) g.gold=999;
+        return strings_format(dst,dsta,1,7,0,0);
+      }
+    default: return strings_format(dst,dsta,1,8,0,0);
+  }
 }

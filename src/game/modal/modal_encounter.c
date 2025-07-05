@@ -45,7 +45,15 @@ static int _encounter_init(struct modal *modal) {
   MODAL->startpulse=PULSE_COUNT;
   modal->opaque=0;
   
-  double difficulty=0.200;
+  /* At odds of (1/n), summon Santa Claus instead of a foe.
+   */
+  const int bonus_odds=10;
+  if (!(rand()%bonus_odds)) {
+    if (!(MODAL->minigame=minigame_new_jumprope(-1.0))) return -1;
+    return 0;
+  }
+  
+  double difficulty=0.200;//TODO
   difficulty=(rand()&0xffff)/65535.0;
   const void *ctorv[]={
     minigame_new_karate,
@@ -79,9 +87,18 @@ static void encounter_set_message(struct modal *modal,int strix,int arg0) {
  */
  
 static void encounter_win(struct modal *modal) {
-  int prize=5;
-  if ((g.gold+=prize)>999) g.gold=999;
-  encounter_set_message(modal,3,prize);
+  char tmp[MSG_LIMIT];
+  int tmpc=minigame_santa_get_message(tmp,sizeof(tmp),MODAL->minigame);
+  if (tmpc>0) {
+    if (tmpc>sizeof(tmp)) tmpc=0;
+    MODAL->msgc=break_text_tiles(MODAL->msg,MSG_LIMIT,&MODAL->msgr,tmp,tmpc);
+    MODAL->msgp=0;
+    MODAL->msgclock=0.0;
+  } else {
+    int prize=5;
+    if ((g.gold+=prize)>999) g.gold=999;
+    encounter_set_message(modal,3,prize);
+  }
 }
 
 /* Minigame was lost.
