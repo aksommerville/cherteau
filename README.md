@@ -14,7 +14,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - Thu 3 July: Navigable outer world, placeholder combat, toll doors. -OK
 - Fri 4 July: Mini games. -2/4
 - Sat 5 July: Full world, graphics. -OK
-- Sun 6 July: Hello, game over, audio, polish.
+- Sun 6 July: Hello, game over, audio, polish. -OK
 - Submissions open until noon Monday. Submit by EOD Sunday.
 
 ## TODO
@@ -64,4 +64,4 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [x] Is there a flash of random content when launching dance off? Or my eyes playing tricks on me...
 - - ...yes. We need to ensure it updates before the first render.
 
-- [ ] Itch page.
+- [x] Itch page.
