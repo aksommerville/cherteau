@@ -31,6 +31,7 @@ static void _tolldoor_bump(struct sprite *sprite) {
     g.gold-=g.tollv[SPRITE->tollid];
     g.tollv[SPRITE->tollid]=0;
     sprite->defunct=1;
+    sprite_spawn(0,&sprite_type_flycoin,sprite->x,sprite->y,0);
   }
 }
 

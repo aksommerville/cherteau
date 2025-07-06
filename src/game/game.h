@@ -67,6 +67,10 @@ extern struct g {
   int poic;
   int hp,maxhp;
   int gold; // 0..999
+  int disphp,dispgold; // What's displayed. world.c manages this; other clients should touch (hp,gold) directly.
+  double disphp_clock;
+  double dispgold_clock;
+  double gold_sound_clock;
   struct sprite **spritev;
   int spritec,spritea;
   struct sprite *hero; // WEAK
@@ -104,5 +108,7 @@ struct rect { int x,y,w,h; };
 int break_text_tiles(struct egg_draw_tile *vtxv,int vtxa,struct rect *bounds,const char *src,int srcc);
 
 int set_flag(int flagid,int v); // => nonzero if changed
+
+void world_update_displayed_stats(double elapsed);
 
 #endif

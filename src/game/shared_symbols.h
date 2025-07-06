@@ -38,10 +38,12 @@
 #define NS_sprtype_dummy 0
 #define NS_sprtype_hero 1
 #define NS_sprtype_tolldoor 2
+#define NS_sprtype_flycoin 3
 #define FOR_EACH_SPRTYPE \
   _(dummy) \
   _(hero) \
-  _(tolldoor)
+  _(tolldoor) \
+  _(flycoin)
   
 #define NS_flag_zero 0
 #define NS_flag_one 1

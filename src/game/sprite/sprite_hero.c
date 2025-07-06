@@ -79,6 +79,9 @@ static void end_step(struct sprite *sprite) {
   sprite->x=SPRITE->dstx;
   sprite->y=SPRITE->dsty;
   SPRITE->walking=0;
+}
+
+static void actuate_tile_things(struct sprite *sprite) {
   const struct rom_command *poi=g.poiv;
   int i=g.poic;
   for (;i-->0;poi++) {
@@ -134,6 +137,7 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
     #define AXISWALK(axis,dir,termcmp,btntag,dx,dy) { \
       sprite->axis+=dir*WALK_SPEED*elapsed; \
       if (sprite->axis termcmp SPRITE->dst##axis) { \
+        actuate_tile_things(sprite); \
         if (g.input&EGG_BTN_##btntag) { \
           if (check_encounters(sprite)) { \
             end_step(sprite); \

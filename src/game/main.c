@@ -174,6 +174,7 @@ void egg_client_update(double elapsed) {
         sprite->type->update(sprite,elapsed);
       }
     }
+    world_update_displayed_stats(elapsed);
     if (g.begin_encounter) {
       g.begin_encounter=0;
       g.modal=modal_new(&modal_type_encounter);

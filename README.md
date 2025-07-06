@@ -47,9 +47,9 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [ ] Game over.
 - [ ] Victory.
 
-- [ ] "Visited" and "seen" maps in minimap.
-- [ ] Animate spending gold.
-- [ ] Visual juice paying tolldoor.
+- [x] "Visited" and "seen" maps in minimap.
+- [x] Animate spending gold.
+- [x] Visual juice paying tolldoor.
 - [ ] Animate walking.
 - [ ] Animate bumping walls.
 - [ ] Karate: Foe should get the same thing as you, and should use exactly enough power to break it.

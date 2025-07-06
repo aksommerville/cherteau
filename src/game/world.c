@@ -220,9 +220,10 @@ static int enter_map(int rid,struct map *map,int dx,int dy) {
  */
  
 int world_reset() {
-  g.hp=5;
+  g.disphp=g.hp=5;
   g.maxhp=5;
-  g.gold=0;
+  g.dispgold=g.gold=0;
+  g.disphp_clock=g.dispgold_clock=0.0;
   memset(g.flagv,0,sizeof(g.flagv));
   g.flagv[1]=1;
   
@@ -303,11 +304,21 @@ void world_render() {
   graf_draw_rect(&g.graf,0,0,FBW,HEADERH,0x000000ff);
   dstx=5;
   dsty=5;
-  for (i=0;i<g.maxhp;i++,dstx+=8) graf_draw_tile(&g.graf,g.texid_sprites,dstx,dsty,(i<g.hp)?0x3b:0x3a,0);
+  if (g.disphp<g.hp) { // Animate gained HP.
+    for (i=0;i<g.disphp;i++,dstx+=8) graf_draw_tile(&g.graf,g.texid_sprites,dstx,dsty,0x3b,0);
+    for (;i<g.hp;i++,dstx+=8) graf_draw_tile(&g.graf,g.texid_sprites,dstx,dsty,(g.framec&8)?0x3b:0x3d,0);
+    for (;i<g.maxhp;i++,dstx+=8) graf_draw_tile(&g.graf,g.texid_sprites,dstx,dsty,0x3a,0);
+  } else if (g.disphp>g.hp) { // Animate lost HP.
+    for (i=0;i<g.hp;i++,dstx+=8) graf_draw_tile(&g.graf,g.texid_sprites,dstx,dsty,0x3b,0);
+    for (;i<g.disphp;i++,dstx+=8) graf_draw_tile(&g.graf,g.texid_sprites,dstx,dsty,(g.framec&8)?0x3b:0x3a,0);
+    for (;i<g.maxhp;i++,dstx+=8) graf_draw_tile(&g.graf,g.texid_sprites,dstx,dsty,0x3a,0);
+  } else {
+    for (i=0;i<g.maxhp;i++,dstx+=8) graf_draw_tile(&g.graf,g.texid_sprites,dstx,dsty,(i<g.hp)?0x3b:0x3a,0);
+  }
   graf_draw_tile(&g.graf,g.texid_sprites,5,15,0x3c,0);
-  graf_draw_tile(&g.graf,g.texid_sprites,16,15,0x30+g.gold/100,0);
-  graf_draw_tile(&g.graf,g.texid_sprites,23,15,0x30+(g.gold/10)%10,0);
-  graf_draw_tile(&g.graf,g.texid_sprites,30,15,0x30+g.gold%10,0);
+  graf_draw_tile(&g.graf,g.texid_sprites,16,15,0x30+g.dispgold/100,0);
+  graf_draw_tile(&g.graf,g.texid_sprites,23,15,0x30+(g.dispgold/10)%10,0);
+  graf_draw_tile(&g.graf,g.texid_sprites,30,15,0x30+g.dispgold%10,0);
   
   // Minimap on the right side of the header.
   int mmw=MINIMAP_COLW*NS_sys_worldw;
@@ -370,4 +381,35 @@ int set_flag(int flagid,int v) {
     }
   }
   return 1;
+}
+
+/* Bring (disphp,dispgold) in line with (hp,gold).
+ */
+ 
+void world_update_displayed_stats(double elapsed) {
+  if (g.disphp_clock>0.0) {
+    if ((g.disphp_clock-=elapsed)<=0.0) {
+      g.disphp=g.hp;
+    }
+  } else if (g.disphp!=g.hp) {
+    g.disphp_clock=2.000;
+  }
+  if (g.dispgold!=g.gold) {
+    const double s_per_dollar=0.030;
+    g.dispgold_clock+=elapsed;
+    while (g.dispgold_clock>s_per_dollar) {
+      g.dispgold_clock-=s_per_dollar;
+      if (g.dispgold<g.gold) g.dispgold++;
+      else if (g.dispgold>g.gold) g.dispgold--;
+      else break;
+    }
+    g.gold_sound_clock+=elapsed;
+    if (g.gold_sound_clock>0.300) {
+      while (g.gold_sound_clock>0.300) g.gold_sound_clock-=0.300;
+      egg_play_sound(RID_sound_gold_nugget);
+    }
+  } else {
+    g.dispgold_clock=0.0;
+    g.gold_sound_clock=0.0;
+  }
 }
