@@ -14,3 +14,4 @@ location 2 1 *
 encodds (u16)-10000 (u16)1500
 sprite @18,8 sprite:tolldoor 0x0d000000
 sprite @4,1 sprite:tolldoor 0x0e000000
+difficulty 0xb0 0xff

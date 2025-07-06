@@ -13,3 +13,4 @@ image image:3
 location 0 1 *
 encodds (u16)-10000 (u16)1500
 sprite @9,7 sprite:tolldoor 0x09000000
+difficulty 0x30 0x60

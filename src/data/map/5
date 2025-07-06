@@ -15,3 +15,4 @@ encodds (u16)-10000 (u16)1500
 sprite @17,8 sprite:tolldoor 0x02000000
 sprite @1,3 sprite:tolldoor 0x03000000
 sprite @15,1 sprite:tolldoor 0x04000000
+difficulty 0x00 0x40

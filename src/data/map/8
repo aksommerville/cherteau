@@ -16,3 +16,4 @@ switchable @10,7 (u16:flag)leftgate
 switchable @10,5 (u16:flag)rightgate
 treadle1 @6,7 (u16:flag)leftgate
 treadle1 @14,5 (u16:flag)rightgate
+difficulty 0x50 0xa0

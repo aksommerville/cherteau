@@ -53,8 +53,8 @@ static int _encounter_init(struct modal *modal) {
     return 0;
   }
   
-  double difficulty=0.200;//TODO
-  difficulty=(rand()&0xffff)/65535.0;
+  double difficulty=(rand()&0xffff)/65535.0;
+  difficulty=g.difflo*(1.0-difficulty)+g.diffhi*difficulty;
   const void *ctorv[]={
     minigame_new_karate,
     minigame_new_dance,
@@ -64,6 +64,7 @@ static int _encounter_init(struct modal *modal) {
   int ctorp=rand()%ctorc;
   struct minigame *(*ctor)(double)=ctorv[ctorp];
   if (!(MODAL->minigame=ctor(difficulty))) return -1;
+  //fprintf(stderr,"chose minigame '%s' at difficulty %f\n",MODAL->minigame->name,difficulty);
   
   return 0;
 }

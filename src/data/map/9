@@ -13,3 +13,4 @@ image image:3
 location 1 0 *
 encodds (u16)-10000 (u16)1500
 treasure @15,4 (u16)1
+difficulty 0x00 0x40

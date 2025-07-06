@@ -15,3 +15,4 @@ encodds (u16)-10000 (u16)1500
 sprite @7,6 sprite:hero 0x00000000
 sprite @9,1 sprite:tolldoor 0x01000000
 treasure @11,2 (u16)0
+difficulty 0x00 0x40

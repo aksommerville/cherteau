@@ -13,6 +13,7 @@
 
 #define CMD_map_image      0x20 /* u16:imageid */
 #define CMD_map_gameover   0x21 /* u16:pos */
+#define CMD_map_difficulty 0x22 /* u8:lo u8:hi */
 #define CMD_map_location   0x40 /* u8:long u8:lat u8:plane u8:reserved */
 #define CMD_map_encodds    0x41 /* s16:init u16:step */
 #define CMD_map_treasure   0x42 /* u16:pos u16:id */

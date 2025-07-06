@@ -80,6 +80,7 @@ extern struct g {
   int encodds; // 0..65535 odds of an encounter on the next step. Can go OOB.
   int encoddsd; // Increase encodds on each step.
   int encodds0;
+  double difflo,diffhi;
   int begin_encounter; // Hero sets this during her update to begin an encounter postcycle.
   int flagv[FLAG_COUNT];
 } g;

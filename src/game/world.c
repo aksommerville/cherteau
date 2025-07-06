@@ -135,6 +135,8 @@ static int enter_map(int rid,struct map *map,int dx,int dy) {
   g.map=map;
   g.encodds=g.encodds0=0;
   g.encoddsd=0;
+  g.difflo=0.0;
+  g.diffhi=1.0;
   g.begin_encounter=0;
   g.poic=0;
   
@@ -147,6 +149,10 @@ static int enter_map(int rid,struct map *map,int dx,int dy) {
           if ((x<NS_sys_mapw)&&(y<NS_sys_maph)&&(g.poic<POI_LIMIT)) {
             g.poiv[g.poic++]=cmd;
           }
+        } break;
+      case CMD_map_difficulty: {
+          g.difflo=cmd.argv[0]/255.0;
+          g.diffhi=cmd.argv[1]/255.0;
         } break;
       case CMD_map_encodds: {
           g.encodds0=(cmd.argv[0]<<8)|cmd.argv[1];
