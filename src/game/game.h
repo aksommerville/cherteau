@@ -87,6 +87,7 @@ extern struct g {
   double difflo,diffhi;
   int begin_encounter; // Hero sets this during her update to begin an encounter postcycle.
   int flagv[FLAG_COUNT];
+  void *last_game; // Used by modal_encounter to prevent playing the same game twice in a row.
 } g;
 
 struct map *mapv_get(int rid);

@@ -226,6 +226,7 @@ int world_reset() {
   g.disphp_clock=g.dispgold_clock=0.0;
   memset(g.flagv,0,sizeof(g.flagv));
   g.flagv[1]=1;
+  g.last_game=0;
   
   struct map *map=g.mapv;
   int i=g.mapc;

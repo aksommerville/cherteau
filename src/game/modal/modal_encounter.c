@@ -46,11 +46,14 @@ static int _encounter_init(struct modal *modal) {
   modal->opaque=0;
   
   /* At odds of (1/n), summon Santa Claus instead of a foe.
+   * Don't do this on the very first play, that would be weird.
    */
-  const int bonus_odds=10;
-  if (!(rand()%bonus_odds)) {
-    if (!(MODAL->minigame=minigame_new_jumprope(-1.0))) return -1;
-    return 0;
+  if (g.last_game) {
+    const int bonus_odds=10;
+    if (!(rand()%bonus_odds)) {
+      if (!(MODAL->minigame=minigame_new_jumprope(-1.0))) return -1;
+      return 0;
+    }
   }
   
   double difficulty=(rand()&0xffff)/65535.0;
@@ -61,8 +64,18 @@ static int _encounter_init(struct modal *modal) {
     minigame_new_jumprope,
   };
   int ctorc=sizeof(ctorv)/sizeof(ctorv[0]);
+  if (g.last_game&&(ctorc>1)) { // Don't play the same minigame twice in a row.
+    int i=ctorc; while (i-->0) {
+      if (ctorv[i]==g.last_game) {
+        ctorc--;
+        memmove(ctorv+i,ctorv+i+1,sizeof(void*)*(ctorc-i));
+        break;
+      }
+    }
+  }
   int ctorp=rand()%ctorc;
   struct minigame *(*ctor)(double)=ctorv[ctorp];
+  g.last_game=ctor;
   if (!(MODAL->minigame=ctor(difficulty))) return -1;
   //fprintf(stderr,"chose minigame '%s' at difficulty %f\n",MODAL->minigame->name,difficulty);
   
