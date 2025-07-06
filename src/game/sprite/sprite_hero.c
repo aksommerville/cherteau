@@ -11,6 +11,8 @@ struct sprite_hero {
   double dstx,dsty;
   int walking;
   uint8_t facedir;
+  double animclock;
+  int animframe;
 };
 
 #define SPRITE ((struct sprite_hero*)sprite)
@@ -192,6 +194,16 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
       }
       break;
   }
+  
+  if (SPRITE->walking) {
+    if ((SPRITE->animclock-=elapsed)<=0.0) {
+      SPRITE->animclock+=0.200;
+      if (++(SPRITE->animframe)>=4) SPRITE->animframe=0;
+    }
+  } else {
+    SPRITE->animclock=0.0;
+    SPRITE->animframe=0;
+  }
 }
 
 /* Position changed from external force.
@@ -224,6 +236,12 @@ static void _hero_render(struct sprite *sprite,int x,int y) {
     case 0x10: tileid+=0x02; break;
     case 0x08: tileid+=0x02; xform=EGG_XFORM_XREV; break;
     case 0x02: break;
+  }
+  if (SPRITE->walking) {
+    switch (SPRITE->animframe) {
+      case 1: tileid+=0x10; break;
+      case 3: tileid+=0x20; break;
+    }
   }
   graf_draw_tile(&g.graf,g.texid_sprites,x,y,tileid,xform);
 }
