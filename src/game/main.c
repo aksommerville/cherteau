@@ -141,8 +141,11 @@ int egg_client_init() {
   
   srand_auto();
   
+  stats_load(&g.stats_best);
+  
   //TODO hello
   world_reset();
+  //g.modal=modal_new(&modal_type_gameover);
   
   return 0;
 }
@@ -158,11 +161,15 @@ void egg_client_update(double elapsed) {
     if (g.modal&&g.modal->type->input) g.modal->type->input(g.modal);
   }
   if (g.modal) {
+    if (g.modal->type==&modal_type_encounter) { // playtime does advance during battle. Not during other modals.
+      g.playtime+=elapsed;
+    }
     if (!g.modal->type->update||(g.modal->type->update(g.modal,elapsed)<=0)) {
       modal_del(g.modal);
       g.modal=0;
     }
   } else if (g.map) {
+    g.playtime+=elapsed;
     int i=g.spritec;
     while (i-->0) {
       struct sprite *sprite=g.spritev[i];

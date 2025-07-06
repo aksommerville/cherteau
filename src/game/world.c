@@ -206,9 +206,6 @@ static int enter_map(int rid,struct map *map,int dx,int dy) {
           uint32_t arg=(cmd.argv[4]<<24)|(cmd.argv[5]<<16)|(cmd.argv[6]<<8)|cmd.argv[7];
           struct sprite *sprite=sprite_spawn(srid,0,x,y,arg);
         } break;
-      case CMD_map_door: {
-          //TODO door
-        } break;
     }
   }
   g.encodds=g.encodds0;
@@ -227,6 +224,8 @@ int world_reset() {
   memset(g.flagv,0,sizeof(g.flagv));
   g.flagv[1]=1;
   g.last_game=0;
+  g.playtime=0.0;
+  g.stepc=g.winc=g.battlec=g.danceoff=0;
   
   struct map *map=g.mapv;
   int i=g.mapc;
@@ -235,7 +234,7 @@ int world_reset() {
     map->visited=0;
   }
   
-  // TODO Treasures and tolls probably shouldn't all be the same value initially.
+  // All tolls start at $10 and treasures at $100.
   memset(g.tollv,10,TOLL_LIMIT);
   g.tollc=TOLL_LIMIT;
   memset(g.treasurev,100,TREASURE_LIMIT);
@@ -414,4 +413,15 @@ void world_update_displayed_stats(double elapsed) {
     g.dispgold_clock=0.0;
     g.gold_sound_clock=0.0;
   }
+}
+
+/* Hero reached the goal.
+ */
+ 
+void win_game() {
+  if (g.modal) {
+    fprintf(stderr,"win_game() with a modal already present (%s) [%s:%d]\n",g.modal->type->name,__FILE__,__LINE__);
+    return;
+  }
+  if (!(g.modal=modal_new(&modal_type_gameover))) return;
 }

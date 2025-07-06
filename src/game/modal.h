@@ -26,5 +26,6 @@ void modal_del(struct modal *modal);
 struct modal *modal_new(const struct modal_type *type);
 
 extern const struct modal_type modal_type_encounter;
+extern const struct modal_type modal_type_gameover;
 
 #endif

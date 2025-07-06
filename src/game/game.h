@@ -44,6 +44,15 @@ struct map {
   int visited;
 };
 
+struct stats {
+  char time[9]; // "MM:SS.mmm" strictly. memcmp() is sensible.
+  int stepc;
+  int winc; // 0..battlec
+  int battlec;
+  int gold;
+  int danceoff;
+};
+
 extern struct g {
   void *rom;
   int romc;
@@ -55,6 +64,7 @@ extern struct g {
   uint8_t physics[256];
   int framec;
   int input,pvinput;
+  struct stats stats_best;
   
   struct map *maps_by_location[NS_sys_worldw*NS_sys_worldh];
   struct map *mapv; // by id; all resources, including invalid locations
@@ -88,6 +98,8 @@ extern struct g {
   int begin_encounter; // Hero sets this during her update to begin an encounter postcycle.
   int flagv[FLAG_COUNT];
   void *last_game; // Used by modal_encounter to prevent playing the same game twice in a row.
+  double playtime; // Includes minigames.
+  int stepc,winc,battlec,danceoff; // Direct stats for current session.
 } g;
 
 struct map *mapv_get(int rid);
@@ -111,5 +123,11 @@ int break_text_tiles(struct egg_draw_tile *vtxv,int vtxa,struct rect *bounds,con
 int set_flag(int flagid,int v); // => nonzero if changed
 
 void world_update_displayed_stats(double elapsed);
+
+void win_game();
+
+void stats_load(struct stats *stats); // From saved high scores, or defaults.
+void stats_save(const struct stats *stats); // Saves the whole thing. Caller should assemble fieldwise first.
+void stats_from_game(struct stats *stats); // From loose fields in (g), the current session.
 
 #endif

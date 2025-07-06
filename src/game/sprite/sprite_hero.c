@@ -84,6 +84,7 @@ static void end_step(struct sprite *sprite) {
 }
 
 static void actuate_tile_things(struct sprite *sprite) {
+  if (g.stepc<INT_MAX) g.stepc++;
   const struct rom_command *poi=g.poiv;
   int i=g.poic;
   for (;i-->0;poi++) {
@@ -91,7 +92,7 @@ static void actuate_tile_things(struct sprite *sprite) {
     if (poi->argv[1]!=SPRITE->qy) continue;
     switch (poi->opcode) {
       case CMD_map_gameover: {
-          fprintf(stderr,"!!! Game over !!! %s:%d\n",__FILE__,__LINE__);
+          win_game();
         } break;
       case CMD_map_treasure: {
           int trid=(poi->argv[2]<<8)|poi->argv[3];

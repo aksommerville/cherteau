@@ -47,6 +47,7 @@ static int _encounter_init(struct modal *modal) {
   
   /* At odds of (1/n), summon Santa Claus instead of a foe.
    * Don't do this on the very first play, that would be weird.
+   * Also it doesn't count toward (winc,battlec).
    */
   if (g.last_game) {
     const int bonus_odds=10;
@@ -78,6 +79,8 @@ static int _encounter_init(struct modal *modal) {
   g.last_game=ctor;
   if (!(MODAL->minigame=ctor(difficulty))) return -1;
   //fprintf(stderr,"chose minigame '%s' at difficulty %f\n",MODAL->minigame->name,difficulty);
+  
+  g.battlec++;
   
   return 0;
 }
@@ -112,6 +115,7 @@ static void encounter_win(struct modal *modal) {
     int prize=5;
     if ((g.gold+=prize)>999) g.gold=999;
     encounter_set_message(modal,3,prize);
+    g.winc++;
   }
 }
 

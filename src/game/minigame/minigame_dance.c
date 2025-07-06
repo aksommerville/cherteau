@@ -94,6 +94,7 @@ static void _dance_del(struct minigame *minigame) {
 static void dance_finish(struct minigame *minigame) {
   if (MINIGAME->score>=MINIGAME->reqscore) minigame->outcome=1;
   else minigame->outcome=-1;
+  if (MINIGAME->score>g.danceoff) g.danceoff=MINIGAME->score;
   //fprintf(stderr,"Final score %d, single=%d, double=%d, triple=%d, miss=%d\n",MINIGAME->score,MINIGAME->singlec,MINIGAME->doublec,MINIGAME->triplec,MINIGAME->missc);
 }
 
