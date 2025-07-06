@@ -13,7 +13,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 
 - Thu 3 July: Navigable outer world, placeholder combat, toll doors. -OK
 - Fri 4 July: Mini games. -2/4
-- Sat 5 July: Full world, graphics.
+- Sat 5 July: Full world, graphics. -OK
 - Sun 6 July: Hello, game over, audio, polish.
 - Submissions open until noon Monday. Submit by EOD Sunday.
 
@@ -41,8 +41,8 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [x] Maps.
 - [x] Difficulty per map.
 - [ ] Final graphics.
-- [ ] Music.
-- [ ] Sound effects.
+- [x] Music.
+- [x] Sound effects.
 - [ ] Hello.
 - [ ] Game over.
 - [ ] Victory.
@@ -57,7 +57,7 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [ ] Karate: Facial expressions.
 - [ ] Karate: Indicator in power meter of required level. Or does that expose too much?
 - [ ] Dance: At the end, I keep wanting to press A and proceed, before the "You win" message.
-- [ ] Dance: Hihat a bit louder.
+- [x] Dance: Hihat a bit louder.
 - [ ] Jumprope: Distraught faces when lost. And some decoration on the rope. An explosion?
 - [x] Dance off animates choppy native. Check `egg_audio_get_playhead`, are we estimating driver buffer position incorrectly?
 - - ...Pulse has its own buffer, and we asked it to set at 50 hz, while we thought it was 100 hz. Fixed, and it's a little less choppy now. Still not great.

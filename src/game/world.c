@@ -404,8 +404,9 @@ void world_update_displayed_stats(double elapsed) {
       else break;
     }
     g.gold_sound_clock+=elapsed;
-    if (g.gold_sound_clock>0.300) {
-      while (g.gold_sound_clock>0.300) g.gold_sound_clock-=0.300;
+    const double ticktime=0.100;
+    if (g.gold_sound_clock>ticktime) {
+      while (g.gold_sound_clock>ticktime) g.gold_sound_clock-=ticktime;
       egg_play_sound(RID_sound_gold_nugget);
     }
   } else {

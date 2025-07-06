@@ -177,6 +177,7 @@ void egg_client_update(double elapsed) {
     world_update_displayed_stats(elapsed);
     if (g.begin_encounter) {
       g.begin_encounter=0;
+      egg_play_sound(RID_sound_encounter);
       g.modal=modal_new(&modal_type_encounter);
     } else {
       if ((g.transition_clock-=elapsed)<=0.0) g.transition=0;
