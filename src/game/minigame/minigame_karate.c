@@ -13,7 +13,7 @@
  */
 #define SPEED_REQ_LO 0.170
 #define SPEED_REQ_HI 0.145
-#define SPEED_AVG_LEN 7
+#define SPEED_AVG_LEN 5
 
 // Your opponent's power rises at a perfectly uniform rate, kind of boring.
 #define SENSEI_RATE 0.100
@@ -34,6 +34,7 @@ struct minigame_karate {
   double speed_threshold;
   double speed_threshlo,speed_threshhi;
   double playclock; // Counts down.
+  double sensei_rate; // Right player's power increases at a fixed rate. He has admirable self-control.
 };
 
 #define MINIGAME ((struct minigame_karate*)minigame)
@@ -96,8 +97,15 @@ static void _karate_update(struct minigame *minigame,double elapsed,int input,in
    */
   if (!MINIGAME->ldone) {
     if ((input&EGG_BTN_SOUTH)&&!(pvinput&EGG_BTN_SOUTH)) {
+      int newp=MINIGAME->avgp;
+      double ago=MINIGAME->clock-0.400;
       MINIGAME->avgv[MINIGAME->avgp++]=MINIGAME->clock;
       if (MINIGAME->avgp>=SPEED_AVG_LEN) MINIGAME->avgp=0;
+      if (MINIGAME->lpower<=0.0) { // From zero, cheat it up.
+        double *dst=MINIGAME->avgv;
+        int i=0;
+        for (;i<SPEED_AVG_LEN;i++,dst++) if ((i!=newp)&&(*dst<ago)) *dst=ago;
+      }
     }
     double ago=MINIGAME->avgv[MINIGAME->avgp];
     double now=MINIGAME->clock;
@@ -118,7 +126,7 @@ static void _karate_update(struct minigame *minigame,double elapsed,int input,in
   }
   
   if (!MINIGAME->rdone) {
-    MINIGAME->rpower+=elapsed*SENSEI_RATE;
+    MINIGAME->rpower+=elapsed*MINIGAME->sensei_rate;
     if (MINIGAME->rpower>1.0) MINIGAME->rpower=1.0;
   }
 }
@@ -160,10 +168,15 @@ static uint32_t meter_color(double v) {
  */
 
 static void draw_karatian(struct minigame *minigame,const struct rect *r,int srcx,int srcy,int srcw,int srch,double power,int thing,int broke) {
-  graf_draw_decal(&g.graf,MINIGAME->texid,r->x+(r->w>>1)-(srcw>>1),r->y+r->h-srch,srcx,srcy,srcw,srch,0);
+
+  // Torso and supports. Static.
+  int bodyx=r->x+(r->w>>1)-(srcw>>1);
+  int bodyy=r->y+r->h-srch;
+  graf_draw_decal(&g.graf,MINIGAME->texid,bodyx,bodyy,srcx,srcy,srcw,srch,0);
   graf_draw_decal(&g.graf,MINIGAME->texid,r->x+6,r->y+r->h-30,56,98,14,30,0);
   graf_draw_decal(&g.graf,MINIGAME->texid,r->x+r->w-20,r->y+r->h-30,56,98,14,30,0);
   
+  // Thing.
   int tsrcx,tsrcy,tw,th,tyoff=0;
   switch (thing) {
     case THING_EGG: {
@@ -226,23 +239,54 @@ static void draw_karatian(struct minigame *minigame,const struct rect *r,int src
   int tdsty=r->y+r->h-30-th+tyoff;
   graf_draw_decal(&g.graf,MINIGAME->texid,tdstx,tdsty,tsrcx,tsrcy,tw,th,0);
   
-  int hsrcx,hsrcy,hw,hh;
+  int hsrcx,hsrcy,hw,hh,hurt=0;
+  int headsrcx,headsrcy,headh; // head width always matches the torso.
   if (r==&MINIGAME->lbox) {
     hsrcx=56;
     hsrcy=68;
     hw=22;
     hh=10;
+    headsrcx=191;
+    headsrcy=1;
+    headh=56;
+    if (MINIGAME->ldone&&!MINIGAME->lbroke) {
+      hurt=1;
+      headsrcy=115;
+    } else if (minigame->outcome>0) {
+      headsrcy=58;
+    }
   } else {
     hsrcx=56;
     hsrcy=79;
     hw=22;
     hh=12;
+    headsrcx=77;
+    headsrcy=141;
+    headh=48;
+    if (MINIGAME->rdone&&!MINIGAME->rbroke) {
+      hurt=1;
+      headsrcx=153;
+      headsrcy=190;
+    } else if (minigame->outcome<0) {
+      headsrcy=190;
+    }
   }
+  graf_draw_decal(&g.graf,MINIGAME->texid,bodyx,bodyy,headsrcx,headsrcy,srcw,headh,0);
   int hdstx=r->x+(r->w>>1)-(hw>>1);
   double hbottom=tdsty-4;
   double htop=r->y+r->h*0.333;
   int hdsty=(int)(htop*power+hbottom*(1.0-power));
+  if (hurt) {
+    int t=g.framec%40;
+    if (t>=20) t=40-t;
+    int alpha=0x80+((t*0x80)/20);
+    if (alpha>0xff) alpha=0xff;
+    graf_set_tint(&g.graf,0xff000000|alpha);
+  }
   graf_draw_decal(&g.graf,MINIGAME->texid,hdstx,hdsty,hsrcx,hsrcy,hw,hh,0);
+  if (hurt) {
+    graf_set_tint(&g.graf,0);
+  }
 }
 
 /* Render.
@@ -261,18 +305,23 @@ static void _karate_render(struct minigame *minigame) {
   RECT(rbox,0x1d5445ff)
   #undef RECT
   
+  // Target line above the meters' background. (lthing and rthing are always the same now).
+  int y=MINIGAME->lmeter.y+MINIGAME->lmeter.h-(int)(power_for_thing(MINIGAME->lthing)*MINIGAME->lmeter.h);
+  graf_draw_rect(&g.graf,MINIGAME->lmeter.x,y,MINIGAME->rmeter.x+MINIGAME->rmeter.w-MINIGAME->lmeter.x,1,0x808080ff);
+  
   // Meter highlight areas.
   int h=(int)(MINIGAME->lpower*MINIGAME->lmeter.h);
   graf_draw_rect(&g.graf,MINIGAME->lmeter.x,MINIGAME->lmeter.y+MINIGAME->lmeter.h-h,MINIGAME->lmeter.w,h,meter_color(MINIGAME->lpower));
   h=(int)(MINIGAME->rpower*MINIGAME->rmeter.h);
   graf_draw_rect(&g.graf,MINIGAME->rmeter.x,MINIGAME->rmeter.y+MINIGAME->rmeter.h-h,MINIGAME->rmeter.w,h,meter_color(MINIGAME->rpower));
   
-  // Dot and Sensei. TODO facial expressions.
+  // Dot and Sensei.
   draw_karatian(minigame,&MINIGAME->lbox,1,1,54,127,MINIGAME->ldone?0.0:MINIGAME->lpower,MINIGAME->lthing,MINIGAME->lbroke);
   draw_karatian(minigame,&MINIGAME->rbox,1,129,75,120,MINIGAME->rdone?0.0:MINIGAME->rpower,MINIGAME->rthing,MINIGAME->rbroke);
   
   // Frame.
   graf_flush(&g.graf);
+  egg_draw_globals(0,0xff); // Seems like a bug in graf, it doesn't unset tint on a flush?
   egg_draw_tile(1,g.texid_sprites,MINIGAME->frame,70);
   
   // Clock.
@@ -347,6 +396,8 @@ struct minigame *minigame_new_karate(double difficulty) {
   }
   #undef ADDVTX
   
+  MINIGAME->playclock=9.0;
+  
   MINIGAME->lpower=0.000;
   MINIGAME->rpower=0.000;
   if (minigame->difficulty<0.250) {
@@ -358,18 +409,24 @@ struct minigame *minigame_new_karate(double difficulty) {
   } else {
     MINIGAME->lthing=THING_GOLD;
   }
-  MINIGAME->rthing=THING_LOG;
+  MINIGAME->rthing=MINIGAME->lthing;
   
   MINIGAME->speed_threshold=SPEED_REQ_LO*(1.0-minigame->difficulty)+SPEED_REQ_HI*minigame->difficulty;
   MINIGAME->speed_threshhi=MINIGAME->speed_threshold*2.0;
   MINIGAME->speed_threshlo=MINIGAME->speed_threshold*0.5;
   
-  // Poison the speed average buffer with times in the distant past, 10 seconds ago.
+  // Sensei uses just enough power to break the thing.
+  // But we fuzz it a little so he hits about half the time.
+  // The first naive calculation is consistently short due to rounding. Perfect!
+  // Adding up to 0.3% randomly yields roughly 1/2 odds against the egg. Should do better against tougher things, which is good.
+  double needpower=power_for_thing(MINIGAME->rthing);
+  MINIGAME->sensei_rate=needpower/MINIGAME->playclock;
+  MINIGAME->sensei_rate+=MINIGAME->sensei_rate*(((rand()&0xffff)/65535.0)*0.003);
+  
+  /* Poison the speed average buffer with times in the distant past, 10 seconds ago. */
   double *p=MINIGAME->avgv;
   int i=SPEED_AVG_LEN;
   for (;i-->0;p++) *p=-10.0;
-  
-  MINIGAME->playclock=9.0;
   
   egg_play_song(RID_song_even_tippier_toe,0,1);
   

@@ -52,10 +52,10 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - [x] Visual juice paying tolldoor.
 - [x] Animate walking.
 - [ ] Animate bumping walls.
-- [ ] Karate: Foe should get the same thing as you, and should use exactly enough power to break it.
-- [ ] Karate: Fudge the mavg such that the first stroke creates visible activity in the meter.
-- [ ] Karate: Facial expressions.
-- [ ] Karate: Indicator in power meter of required level. Or does that expose too much?
+- [x] Karate: Foe should get the same thing as you, and should use exactly enough power to break it.
+- [x] Karate: Fudge the mavg such that the first stroke creates visible activity in the meter.
+- [x] Karate: Facial expressions.
+- [x] Karate: Indicator in power meter of required level. Or does that expose too much?
 - [ ] Dance: At the end, I keep wanting to press A and proceed, before the "You win" message.
 - [x] Dance: Hihat a bit louder.
 - [ ] Jumprope: Distraught faces when lost. And some decoration on the rope. An explosion?

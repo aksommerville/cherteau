@@ -11,7 +11,7 @@
 
 image image:3
 location 1 2 0 0
-encodds (u16)-10000 (u16)1500
+encodds (u16)-5000 (u16)2000
 sprite @7,6 sprite:hero 0x00000000
 sprite @9,1 sprite:tolldoor 0x01000000
 treasure @11,2 (u16)0

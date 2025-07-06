@@ -129,7 +129,9 @@ static void _jumprope_update(struct minigame *minigame,double elapsed,int input,
   // The fancier bits are all in render, we just tick the clock and signal completion.
   if (MINIGAME->santa_mode) {
     MINIGAME->xmasclock+=elapsed;
-    if ((input&EGG_BTN_SOUTH)&&!(pvinput&EGG_BTN_SOUTH)) MINIGAME->xmasclock=5.0;
+    if (MINIGAME->xmasclock>=0.5) {
+      if ((input&EGG_BTN_SOUTH)&&!(pvinput&EGG_BTN_SOUTH)) MINIGAME->xmasclock=5.0;
+    }
     if (MINIGAME->xmasclock>=4.0) {
       minigame->outcome=1;
     }
@@ -262,11 +264,11 @@ static void draw_xmas(struct minigame *minigame) {
   int santay=Y_FLOOR-61;
   graf_draw_decal(&g.graf,MINIGAME->texid,santax,santay,143,92,63,61,0);
   if (MINIGAME->xmasclock>3.000) {
-    // ok done throwing it, arm disappears
+    // ok done throwing it, arm disappears.
   } else if (MINIGAME->xmasclock>2.000) {
     // throwing it
     graf_draw_decal(&g.graf,MINIGAME->texid,santax+12,santay+14,207,85,19,18,0);
-  } else if (MINIGAME->xmasclock>1.000) {
+  } else if (MINIGAME->xmasclock>0.500) {
     // brandishing
     graf_draw_decal(&g.graf,MINIGAME->texid,santax+13,santay+26,207,76,17,8,0);
     graf_draw_tile(&g.graf,MINIGAME->texid,santax+11,santay+28,MINIGAME->prize,0);
@@ -286,6 +288,8 @@ static void draw_xmas(struct minigame *minigame) {
     y*=arch;
     y=y0-(arch-y);
     graf_draw_tile(&g.graf,MINIGAME->texid,(int)x,(int)y,MINIGAME->prize,0);
+  } else if (MINIGAME->xmasclock>=4.000) {
+    graf_draw_tile(&g.graf,MINIGAME->texid,120,santay+28,MINIGAME->prize,0);
   }
 }
 
