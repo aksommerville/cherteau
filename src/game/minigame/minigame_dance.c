@@ -314,6 +314,7 @@ struct minigame *minigame_new_dance(double difficulty) {
   minigame->update=_dance_update;
   minigame->render=_dance_render;
   minigame->difficulty=(difficulty<=0.0)?0.0:(difficulty>=1.0)?1.0:difficulty;
+  minigame->skip_cooldown=1;
   
   if (egg_texture_load_image(MINIGAME->texid=egg_texture_new(),RID_image_dance)<0) {
     _dance_del(minigame);

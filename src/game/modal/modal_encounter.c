@@ -151,7 +151,7 @@ static int _encounter_update(struct modal *modal,double elapsed) {
   
   // Detect establishment of outcome.
   if (MODAL->minigame->outcome&&!MODAL->outcome) {
-    MODAL->coolclock=1.000;
+    if (!MODAL->minigame->skip_cooldown) MODAL->coolclock=1.000;
     MODAL->outcome=MODAL->minigame->outcome;
     if (MODAL->outcome>0) {
       encounter_win(modal);

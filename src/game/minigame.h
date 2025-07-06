@@ -17,6 +17,7 @@ struct minigame {
   
   int outcome; // -1,0,1 = lose,pending,win
   double difficulty; // 0..1, constant
+  int skip_cooldown; // Nonzero to skip the usual 1-second cooldown post game, for games that aren't hitting A at the end.
 };
 
 struct minigame *minigame_new_karate(double difficulty);

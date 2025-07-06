@@ -240,14 +240,16 @@ static int draw_rope(struct minigame *minigame) {
 }
 
 /* Draw Dot or Rabbit.
- * Each must have two frames of equal size. Jumping immediately right of Idle.
+ * Each must have three frames of equal size, left to right: Idle, jump, lose.
  */
  
-static void draw_jumper(struct minigame *minigame,int dstx,int srcx,int srcy,int w,int h,double jump) {
+static void draw_jumper(struct minigame *minigame,int dstx,int srcx,int srcy,int w,int h,double jump,int lose) {
   int dsty=Y_FLOOR-h;
   if (jump>0.0) {
     srcx+=w+1;
     dsty-=(int)jump;
+  } else if (lose) {
+    srcx+=(w+1)*2;
   }
   graf_draw_decal(&g.graf,MINIGAME->texid,dstx,dsty,srcx,srcy,w,h,0);
 }
@@ -258,19 +260,19 @@ static void draw_jumper(struct minigame *minigame,int dstx,int srcx,int srcy,int
  */
  
 static void draw_xmas(struct minigame *minigame) {
-  draw_jumper(minigame,100,135,33,35,58,MINIGAME->ljump);
+  draw_jumper(minigame,100,62,33,35,58,MINIGAME->ljump,0);
   
   int santax=180;
   int santay=Y_FLOOR-61;
-  graf_draw_decal(&g.graf,MINIGAME->texid,santax,santay,143,92,63,61,0);
+  graf_draw_decal(&g.graf,MINIGAME->texid,santax,santay,70,92,63,61,0);
   if (MINIGAME->xmasclock>3.000) {
     // ok done throwing it, arm disappears.
   } else if (MINIGAME->xmasclock>2.000) {
     // throwing it
-    graf_draw_decal(&g.graf,MINIGAME->texid,santax+12,santay+14,207,85,19,18,0);
+    graf_draw_decal(&g.graf,MINIGAME->texid,santax+12,santay+14,134,101,19,18,0);
   } else if (MINIGAME->xmasclock>0.500) {
     // brandishing
-    graf_draw_decal(&g.graf,MINIGAME->texid,santax+13,santay+26,207,76,17,8,0);
+    graf_draw_decal(&g.graf,MINIGAME->texid,santax+13,santay+26,134,92,17,8,0);
     graf_draw_tile(&g.graf,MINIGAME->texid,santax+11,santay+28,MINIGAME->prize,0);
   }
   
@@ -309,11 +311,11 @@ static void _jumprope_render(struct minigame *minigame) {
   } else if (MINIGAME->rope<0.5) {
     ropey=draw_rope(minigame);
     graf_flush(&g.graf);
-    draw_jumper(minigame,100,135,33,35,58,MINIGAME->ljump);
-    draw_jumper(minigame,200,207,33,24,42,MINIGAME->rjump);
+    draw_jumper(minigame,100, 62,33,35,58,MINIGAME->ljump,minigame->outcome<0);
+    draw_jumper(minigame,200,170,33,24,42,MINIGAME->rjump,minigame->outcome>0);
   } else {
-    draw_jumper(minigame,100,135,33,35,58,MINIGAME->ljump);
-    draw_jumper(minigame,200,207,33,24,42,MINIGAME->rjump);
+    draw_jumper(minigame,100, 62,33,35,58,MINIGAME->ljump,minigame->outcome<0);
+    draw_jumper(minigame,200,170,33,24,42,MINIGAME->rjump,minigame->outcome>0);
     ropey=draw_rope(minigame);
   }
   
@@ -370,7 +372,7 @@ struct minigame *minigame_new_jumprope(double difficulty) {
   }
   struct egg_draw_decal decal={
     .dstx=0,.dsty=0,
-    .srcx=40,.srcy=79,
+    .srcx=1,.srcy=99,
     .w=68,.h=56,
     .xform=0,
   };
