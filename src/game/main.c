@@ -143,9 +143,7 @@ int egg_client_init() {
   
   stats_load(&g.stats_best);
   
-  //TODO hello
-  world_reset();
-  //g.modal=modal_new(&modal_type_gameover);
+  g.modal=modal_new(&modal_type_hello);
   
   return 0;
 }
@@ -155,8 +153,10 @@ void egg_client_update(double elapsed) {
   g.input=egg_input_get_one(0);
   if (g.input!=g.pvinput) {
     if ((g.input&EGG_BTN_AUX3)&&!(g.pvinput&EGG_BTN_AUX3)) {
-      egg_terminate(0);//TODO return to main menu, don't terminate
-      return;
+      if (!g.modal||(g.modal->type!=&modal_type_hello)) {
+        modal_del(g.modal);
+        g.modal=modal_new(&modal_type_hello);
+      }
     }
     if (g.modal&&g.modal->type->input) g.modal->type->input(g.modal);
   }
@@ -165,8 +165,12 @@ void egg_client_update(double elapsed) {
       g.playtime+=elapsed;
     }
     if (!g.modal->type->update||(g.modal->type->update(g.modal,elapsed)<=0)) {
+      int tohello=(g.modal->type==&modal_type_gameover)||(g.hp<=0);
       modal_del(g.modal);
       g.modal=0;
+      if (tohello) {
+        g.modal=modal_new(&modal_type_hello);
+      }
     }
   } else if (g.map) {
     g.playtime+=elapsed;
@@ -190,8 +194,8 @@ void egg_client_update(double elapsed) {
       if ((g.transition_clock-=elapsed)<=0.0) g.transition=0;
       check_transitions();
       if (g.hp<=0) {
-        fprintf(stderr,"%s:%d:TODO: Hero dead.\n",__FILE__,__LINE__);
-        world_reset();
+        modal_del(g.modal); // should be null already but be safe
+        g.modal=modal_new(&modal_type_hello);
       }
     }
   }
