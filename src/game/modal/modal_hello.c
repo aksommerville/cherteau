@@ -55,7 +55,7 @@ static int add_option(struct modal *modal,int strix) {
  */
  
 static int _hello_init(struct modal *modal) {
-  egg_play_song(0,0,0);//TODO new song
+  egg_play_song(RID_song_at_terrible_cost,0,1);
   
   if (egg_texture_load_image(MODAL->texid=egg_texture_new(),RID_image_hello)<0) return -1;
   
