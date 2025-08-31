@@ -65,3 +65,13 @@ Code For A Cause Micro Jam, July 2025, theme "EVERY ACTION HAS A COST".
 - - ...yes. We need to ensure it updates before the first render.
 
 - [x] Itch page.
+
+### Feedback from Jam
+
+TechHead 2025-07-07
+ - Dance-Off: Top hit should be green, not red!
+ - Chest from the second room should have been more obvious.
+ - Too much grinding. Comments from the room as well.
+ - And he gave up at the last room :(
+ - "I got a little jump-scared by Santa". By design, buddy, by design.
+ - Karate chop sounds.

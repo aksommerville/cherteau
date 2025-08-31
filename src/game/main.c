@@ -152,7 +152,10 @@ void egg_client_update(double elapsed) {
   g.pvinput=g.input;
   g.input=egg_input_get_one(0);
   if (g.input!=g.pvinput) {
-    if ((g.input&EGG_BTN_AUX3)&&!(g.pvinput&EGG_BTN_AUX3)) {
+    if (
+      ((g.input&EGG_BTN_AUX3)&&!(g.pvinput&EGG_BTN_AUX3))||
+      ((g.input&EGG_BTN_AUX2)&&!(g.pvinput&EGG_BTN_AUX2))
+    ) {
       if (!g.modal||(g.modal->type!=&modal_type_hello)) {
         modal_del(g.modal);
         g.modal=modal_new(&modal_type_hello);
